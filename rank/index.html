@@ -224,6 +224,19 @@ table{border-collapse:collapse;width:100%}
 .chart-empty svg{width:22px;height:22px}
 .chart-empty p{font-size:12px}
 
+/* 측정일이 하루뿐일 때: 추이 대신 오늘 순위 막대 */
+.snap-chart{padding:14px 10px 6px;min-height:220px;display:flex;flex-direction:column;justify-content:center}
+.snap-head{display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:800;color:var(--muted-2);padding:0 2px 8px}
+.snap-row{display:grid;grid-template-columns:132px minmax(0,1fr) 56px;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--line-2)}
+.snap-row:first-of-type{border-top:0}
+.snap-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ink-2);min-width:0}
+.snap-label i{width:8px;height:8px;border-radius:3px;flex:0 0 auto}
+.snap-label span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.snap-track{position:relative;height:8px;border-radius:6px;background:linear-gradient(90deg,#eef2fb,#e6ecf9)}
+.snap-mark{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;transform:translate(-50%,-50%);border:2.5px solid #fff;box-shadow:0 1px 4px rgba(14,21,38,.22)}
+.snap-value{text-align:right;font-size:13px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.snap-value.none{color:var(--muted-2);font-weight:700;font-size:12px}
+
 /* ============================== insight ================================ */
 .insight{padding:0 0 8px;display:flex;flex-direction:column;min-width:0}
 .insight-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:17px 18px 10px;border-bottom:1px solid var(--line-2)}
@@ -556,6 +569,8 @@ body.modal-open{overflow:hidden}
   .toast{bottom:18px;font-size:12px}
 }
 @media (max-width:560px){
+  .snap-row{grid-template-columns:112px minmax(0,1fr) 50px;gap:8px}
+  .snap-chart{padding:12px 4px 4px;min-height:180px}
   .kpi-grid{grid-template-columns:1fr 1fr;gap:9px}
   .kpi-grid .kpi:last-child:nth-child(odd){grid-column:span 2}
   .kpi{padding:13px 13px 12px;border-radius:15px}
@@ -797,15 +812,18 @@ body.modal-open{overflow:hidden}
 <script>
 /* =========================================================================
    그로스코리아 (GROWTH KOREA) — 지점별 네이버 플레이스 순위 대시보드
-   data.js : 브랜드 / 지점 / 키워드 / 최근 14일 샘플 추이
+   data.js : 브랜드 / 지점 / 키워드 / 실측 순위 기록
    -------------------------------------------------------------------------
-   - 실제 매장 정보(와그자그 교동점 플레이스 ID)만 실제 값이고,
-     나머지 지점·키워드·순위는 화면 확인용 샘플입니다.
-   - 오늘 날짜를 기준으로 최근 14일을 다시 만들어 넣습니다.
-   - 운영 시에는 이 파일 대신 JSON 가져오기로 실제 수집 데이터를 넣습니다.
+   - 2026-11-26 네이버 모바일 플레이스 검색결과(광고 카드 제외) 실측값입니다.
+     측정 방법·근거는 data/measured-2026-11-26.md 참고.
+   - 측정하지 않은 날짜는 기록을 넣지 않습니다(= 미확인).
+     rank: null 은 '권외(100위 밖)'입니다.
+   - 운영 시에는 이 파일 대신 JSON 가져오기로 매일 수집 데이터를 넣습니다.
    ========================================================================= */
 (function () {
   'use strict';
+
+  var MEASURED_AT = '2026-11-26';
 
   var BRANDS = [
     { id: 'room',   name: '룸의정석',     color: '#7a2ff2', soft: '#f2ecff', ink: '#5a1fbe' },
@@ -815,109 +833,82 @@ body.modal-open{overflow:hidden}
 
   var BRANCHES = [
     { id: 'b-hongdae', brandId: 'room', name: '룸의정석 홍대점', short: '홍대점',
-      area: '서울 마포구 서교동', address: '서울 마포구 와우산로 21길', placeId: '',
-      memo: '금·토 21~24시 대기 발생' },
+      area: '서울 마포구 서교동', address: '', placeId: '1319671163', memo: '' },
     { id: 'b-gangnam', brandId: 'room', name: '룸의정석 강남점', short: '강남점',
-      area: '서울 강남구 역삼동', address: '서울 강남구 강남대로94길', placeId: '',
-      memo: '주말 예약 마감 잦음' },
+      area: '서울 서초구 서초동', address: '', placeId: '1922690050', memo: '' },
     { id: 'b-moran', brandId: 'room', name: '룸의정석 모란점', short: '모란점',
-      area: '성남시 중원구 성남동', address: '경기 성남시 중원구 성남대로', placeId: '',
-      memo: '모란역 1번 출구 도보 3분' },
+      area: '성남시 중원구 성남동', address: '', placeId: '1813058736', memo: '' },
     { id: 'b-wagzag', brandId: 'wagzag', name: '와그자그 교동점', short: '교동점',
       area: '대구 중구 교동', address: '대구 중구 경상감영길 181 2층', placeId: '1085497413',
       memo: '17:00~02:00 · 단체 2~30인' },
     { id: 'b-nonda-ds', brandId: 'nonda', name: '논다노래타운 동성로점', short: '동성로점',
-      area: '대구 중구 동성로', address: '대구 중구 동성로2가', placeId: '',
-      memo: '' },
+      area: '대구 중구 동문동', address: '', placeId: '1551625805',
+      memo: '네이버 상호 “논다노래타운 교동점”' },
     { id: 'b-nonda-sm', brandId: 'nonda', name: '논다노래타운 서면점', short: '서면점',
-      area: '부산 부산진구 부전동', address: '부산 부산진구 서면로', placeId: '',
-      memo: '' }
+      area: '부산 부산진구 부전동', address: '', placeId: '2007654428',
+      memo: '네이버 상호 “논다노래타운 부산서면점”' }
   ];
 
-  /* shape : 14일 전 → 오늘 순위. null = 100위 밖(권외) */
+  /* records: { 'YYYY-MM-DD': { rank: 숫자 | null(권외), status: 'manual'|'auto', at: 'HH:MM' } }
+     실제로 측정한 날짜만 넣습니다. */
   var KEYWORDS = [
     { id: 'k-hd-1', branchId: 'b-hongdae', text: '홍대 헌팅포차', target: 3, priority: 'main',
-      shape: [9, 8, 8, 7, 7, 6, 6, 6, 5, 5, 6, 5, 6, 4], todayStatus: 'manual' },
+      records: { '2026-11-26': { rank: 8, status: 'manual', at: '17:02' } } },
     { id: 'k-hd-2', branchId: 'b-hongdae', text: '홍대 헌팅술집', target: 5, priority: 'main',
-      shape: [12, 11, 11, 10, 9, 9, 8, 8, 9, 7, 7, 6, 8, 7] },
+      records: { '2026-11-26': { rank: 8, status: 'manual', at: '17:02' } } },
     { id: 'k-hd-3', branchId: 'b-hongdae', text: '홍대 술집', target: 10, priority: 'sub',
-      shape: [18, 17, 16, 16, 15, 14, 15, 13, 13, 12, 11, 12, 11, 11] },
+      records: { '2026-11-26': { rank: null, status: 'manual', at: '17:04' } } },
     { id: 'k-gn-1', branchId: 'b-gangnam', text: '강남 헌팅포차', target: 5, priority: 'main',
-      shape: [7, 6, 6, 5, 5, 4, 4, 3, 4, 3, 2, 2, 2, 3] },
+      records: { '2026-11-26': { rank: 8, status: 'manual', at: '17:06' } } },
     { id: 'k-gn-2', branchId: 'b-gangnam', text: '강남역 술집', target: 10, priority: 'sub',
-      shape: [22, 21, 20, 19, 18, 18, 17, 16, 15, 15, 14, 13, 13, 12] },
+      records: { '2026-11-26': { rank: 58, status: 'manual', at: '17:08' } } },
     { id: 'k-mr-1', branchId: 'b-moran', text: '모란 헌팅포차', target: 5, priority: 'main',
-      shape: [11, 10, 10, 9, 9, 8, 7, 8, 7, 6, 6, 5, 6, 5] },
+      records: { '2026-11-26': { rank: 1, status: 'manual', at: '17:09' } } },
     { id: 'k-mr-2', branchId: 'b-moran', text: '모란역 술집', target: 10, priority: 'sub',
-      shape: [16, 15, 14, 14, 13, 12, 12, 11, 11, 10, 10, 9, 9, 9] },
+      records: { '2026-11-26': { rank: 33, status: 'manual', at: '17:10' } } },
     { id: 'k-wg-1', branchId: 'b-wagzag', text: '대구 교동 술집', target: 20, priority: 'main',
-      shape: [34, 33, 32, 31, 30, 29, 28, 29, 30, 31, 32, 33, 32, 31] },
+      records: {
+        '2026-11-22': { rank: 28, status: 'manual', at: '17:58' },
+        '2026-11-24': { rank: 31, status: 'manual', at: '15:11' },
+        '2026-11-25': { rank: 31, status: 'manual', at: '15:00' },
+        '2026-11-26': { rank: 31, status: 'manual', at: '17:03' }
+      } },
     { id: 'k-wg-2', branchId: 'b-wagzag', text: '동성로 술집', target: 20, priority: 'sub',
-      shape: [null, null, null, 96, 88, 79, 70, 62, 54, 47, 41, 35, 29, 24] },
+      records: { '2026-11-26': { rank: null, status: 'manual', at: '17:03' } } },
     { id: 'k-nd-1', branchId: 'b-nonda-ds', text: '대구 동성로 노래방', target: 10, priority: 'main',
-      shape: [14, 13, 13, 12, 12, 11, 11, 10, 10, 9, 9, 8, 8, 7] },
+      records: { '2026-11-26': { rank: null, status: 'manual', at: '17:11' } } },
     { id: 'k-nd-2', branchId: 'b-nonda-sm', text: '부산 서면 노래방', target: 10, priority: 'sub',
-      shape: [25, 24, 24, 23, 22, 22, 21, 20, 20, 19, 18, 18, 17, 17], pendingToday: true }
+      records: { '2026-11-26': { rank: null, status: 'manual', at: '17:12' } } }
   ];
 
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-
-  function isoOf(d) {
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-  }
-
-  function daysEnding(endISO, n) {
-    var p = endISO.split('-').map(Number);
-    var out = [];
-    for (var i = n - 1; i >= 0; i--) {
-      var d = new Date(p[0], p[1] - 1, p[2], 12, 0, 0);
-      d.setDate(d.getDate() - i);
-      out.push(isoOf(d));
-    }
-    return out;
-  }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
   function buildSeed() {
-    var today = isoOf(new Date());
-    var dates = daysEnding(today, 14);
-    var keywords = KEYWORDS.map(function (k) {
-      var records = {};
-      k.shape.forEach(function (rank, i) {
-        var last = i === k.shape.length - 1;
-        if (last && k.pendingToday) return;              // 오늘 미확인
-        var status = last ? (k.todayStatus || 'auto') : 'auto';
-        records[dates[i]] = {
-          rank: rank === null ? null : rank,
-          status: status,
-          at: last ? (status === 'manual' ? '09:12' : '09:05') : '09:05'
-        };
-      });
-      return {
-        id: k.id,
-        branchId: k.branchId,
-        text: k.text,
-        target: k.target,
-        priority: k.priority || 'sub',
-        active: true,
-        records: records
-      };
-    });
-
     return {
-      version: 1,
+      version: 2,
       kind: 'place-rank-dashboard',
       createdAt: new Date().toISOString(),
-      settings: { targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: true },
-      brands: BRANDS.map(function (b) { return Object.assign({}, b); }),
-      branches: BRANCHES.map(function (b) { return Object.assign({}, b); }),
-      keywords: keywords
+      settings: {
+        targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false,
+        source: 'naver-place-mobile',
+        measuredAt: MEASURED_AT
+      },
+      brands: BRANDS.map(clone),
+      branches: BRANCHES.map(clone),
+      keywords: KEYWORDS.map(function (k) {
+        var out = clone(k);
+        out.active = true;
+        out.records = out.records || {};
+        return out;
+      })
     };
   }
 
   window.SEED = {
     build: buildSeed,
     brands: BRANDS,
-    brandsById: BRANDS.reduce(function (m, b) { m[b.id] = b; return m; }, {})
+    brandsById: BRANDS.reduce(function (m, b) { m[b.id] = b; return m; }, {}),
+    measuredAt: MEASURED_AT
   };
 })();
 
@@ -929,7 +920,10 @@ body.modal-open{overflow:hidden}
 (function () {
   'use strict';
 
-  var KEY = 'gk.placeRank.v1';
+  /* 저장 키 버전을 올려(v1 → v2), 예전에 샘플 데이터를 들고 있던 브라우저도
+     새 실측 데이터로 자동 교체되게 합니다. (아래 adoptLegacy 참고) */
+  var KEY = 'gk.placeRank.v2';
+  var LEGACY_KEYS = ['gk.placeRank.v1'];
   var state = null;
 
   /* ---------------------------------------------------------------- date ---- */
@@ -977,7 +971,8 @@ body.modal-open{overflow:hidden}
   function normalize(s) {
     if (!s || !s.branches || !s.keywords) return seed();
     s.brands = s.brands && s.brands.length ? s.brands : window.SEED.brands;
-    s.settings = Object.assign({ targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false }, s.settings || {});
+    s.version = 2;
+    s.settings = Object.assign({ targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false, source: 'naver-place-mobile' }, s.settings || {});
     s.keywords.forEach(function (k) {
       k.records = k.records || {};
       k.target = Number(k.target) || 10;
@@ -985,13 +980,34 @@ body.modal-open{overflow:hidden}
     });
     return s;
   }
+  /* v1 키에 남은 '샘플 데이터(demo:true)'는 가져오지 않고 버립니다.
+     사용자가 실제 JSON/CSV를 가져와 demo:false 가 된 기록만 이어받습니다. */
+  function adoptLegacy() {
+    for (var i = 0; i < LEGACY_KEYS.length; i++) {
+      var raw = null;
+      try { raw = localStorage.getItem(LEGACY_KEYS[i]); } catch (e) { return null; }
+      if (!raw) continue;
+      var s = null;
+      try { s = JSON.parse(raw); } catch (e) { s = null; }
+      var real = !!(s && s.branches && s.keywords && s.settings && s.settings.demo === false &&
+        s.keywords.some(function (k) { return k.records && Object.keys(k.records).length; }));
+      if (real) { s.version = 2; return s; }
+      try { localStorage.removeItem(LEGACY_KEYS[i]); } catch (e) { /* 무시 */ }
+    }
+    return null;
+  }
   function load() {
     if (state) return state;
     try {
       var raw = localStorage.getItem(KEY);
       if (raw) state = normalize(JSON.parse(raw));
     } catch (e) { console.warn('저장된 데이터를 읽지 못했습니다.', e); }
+    if (!state) {
+      var legacy = adoptLegacy();
+      if (legacy) state = normalize(legacy);
+    }
     if (!state) { state = seed(); save(); }
+    else save();
     return state;
   }
   function save() {
@@ -1005,7 +1021,7 @@ body.modal-open{overflow:hidden}
   }
   function blank() {
     return normalize({
-      version: 1, kind: 'place-rank-dashboard',
+      version: 2, kind: 'place-rank-dashboard',
       settings: { targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false },
       brands: window.SEED.brands, branches: [], keywords: []
     });
@@ -1119,6 +1135,7 @@ body.modal-open{overflow:hidden}
     var avg = measured.length ? measured.reduce(function (s, r) { return s + r.rank; }, 0) / measured.length : null;
     var pair = rows.filter(function (r) { return r.rank !== null && r.prev !== null; });
     var prevAvg = pair.length ? pair.reduce(function (s, r) { return s + r.prev; }, 0) / pair.length : null;
+    var pairAvg = pair.length ? pair.reduce(function (s, r) { return s + r.rank; }, 0) / pair.length : null;
     var top5 = measured.filter(function (r) { return r.rank <= (load().settings.targetTop || 5); }).length;
     var up = rows.filter(function (r) { return r.delta !== null && r.delta > 0; }).length;
     var down = rows.filter(function (r) { return r.delta !== null && r.delta < 0; }).length;
@@ -1130,8 +1147,8 @@ body.modal-open{overflow:hidden}
     list.forEach(function (k) { if (branchIds.indexOf(k.branchId) < 0) branchIds.push(k.branchId); });
     return {
       rows: rows, count: rows.length, measured: measured.length,
-      branches: branchIds.length, avg: avg, prevAvg: prevAvg,
-      avgDiff: (avg !== null && prevAvg !== null) ? prevAvg - avg : null,
+      branches: branchIds.length, avg: avg, prevAvg: prevAvg, pairAvg: pairAvg, paired: pair.length,
+      avgDiff: (pairAvg !== null && prevAvg !== null) ? prevAvg - pairAvg : null,
       top5: top5, top5Rate: measured.length ? Math.round(top5 / measured.length * 100) : 0,
       up: up, down: down, flat: flat, met: met, near: near, pending: pending
     };
@@ -1246,7 +1263,7 @@ body.modal-open{overflow:hidden}
     var s = load();
     return JSON.stringify({
       kind: 'place-rank-dashboard',
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
       settings: s.settings,
       brands: s.brands,
@@ -1399,6 +1416,10 @@ body.modal-open{overflow:hidden}
         }
       });
       if (report.updated || report.addedKeywords) s.settings.demo = false;
+      if (report.dates.length) {
+        var latest = report.dates.slice().sort().pop();
+        if (!s.settings.measuredAt || latest > s.settings.measuredAt) s.settings.measuredAt = latest;
+      }
       save();
       return report;
     }
@@ -1815,7 +1836,8 @@ body.modal-open{overflow:hidden}
     var avgDiff = m.avgDiff;
     var avgSub = avgDiff === null
       ? '비교할 전일 기록이 없습니다'
-      : '전일 ' + avgText(m.prevAvg) + '위 → ' + (avgDiff > 0 ? '<b class="t-up">▲' + avgDiff.toFixed(1) + '</b>' : avgDiff < 0 ? '<b class="t-down">▼' + Math.abs(avgDiff).toFixed(1) + '</b>' : '변동 없음');
+      : (avgDiff === 0 ? '전일 ' + avgText(m.prevAvg) + '위 → 변동 없음' : '전일 ' + avgText(m.prevAvg) + '위 → ' + (avgDiff > 0 ? '<b class="t-up">▲' + avgDiff.toFixed(1) + '</b>' : '<b class="t-down">▼' + Math.abs(avgDiff).toFixed(1) + '</b>')) +
+        (m.paired && m.paired < m.measured ? ' · 전일 기록 ' + m.paired + '개 기준' : '');
 
     var moveBars = '';
     var total = Math.max(1, m.up + m.down + m.flat);
@@ -1872,17 +1894,39 @@ body.modal-open{overflow:hidden}
   }
 
   /* ----------------------------------------------------------------- chart -- */
-  function avgSeries(list, dates) {
+  function avgOf(list, dates) {
     return dates.map(function (d) {
       var vals = list.map(function (k) { return Store.rankOn(k, d); })
         .filter(function (v) { return typeof v === 'number'; });
       return { date: d, rank: vals.length ? vals.reduce(function (s, v) { return s + v; }, 0) / vals.length : null };
     });
   }
+  function pointsOf(kw, dates) {
+    return dates.map(function (d) { return { date: d, rank: Store.rankOn(kw, d) }; });
+  }
+
+  /* 측정 기록이 있는 첫 날짜. 그보다 앞은 빈 그래프가 되므로 창을 줄입니다. */
+  function measuredStart(list, date) {
+    var first = null;
+    (list || []).forEach(function (k) {
+      Object.keys(k.records || {}).forEach(function (d) {
+        if (d <= date && (!first || d < first)) first = d;
+      });
+    });
+    return first;
+  }
+  function windowOf(list, date, range) {
+    var all = Store.daysEnding(date, range);
+    var first = measuredStart(list, date);
+    if (!first) return { dates: all, trimmed: false, first: null };
+    var keep = all.filter(function (d) { return d >= first; });
+    if (!keep.length) keep = [all[all.length - 1]];
+    while (keep.length < 3 && all.indexOf(keep[0]) > 0) keep.unshift(all[all.indexOf(keep[0]) - 1]);
+    return { dates: keep, trimmed: keep.length < all.length, first: first };
+  }
 
   function buildSeries(ui, date) {
     var range = ui.range || 14;
-    var dates = Store.daysEnding(date, range);
     var list = Store.filterKeywords({ brand: ui.brand, branch: ui.branch, q: ui.q });
     var out = [];
     var focus = ui.focus || { type: 'all' };
@@ -1891,12 +1935,16 @@ body.modal-open{overflow:hidden}
       var kw = Store.keywordOf(focus.id);
       if (kw) {
         var branch = Store.branchOf(kw.branchId);
-        out.push({ id: 'kw', label: kw.text, color: PALETTE[0], points: Store.seriesOf(kw, date, range) });
+        var win1 = windowOf([kw], date, range);
+        out.push({ id: 'kw', label: kw.text, color: PALETTE[0], points: pointsOf(kw, win1.dates) });
         var sibs = Store.keywordsOf(kw.branchId);
         if (sibs.length > 1) {
-          out.push({ id: 'avg', label: (branch ? branch.short : '') + ' 평균', color: '#8a93a7', dash: true, points: avgSeries(sibs, dates) });
+          out.push({ id: 'avg', label: (branch ? branch.short : '') + ' 평균', color: '#8a93a7', dash: true, points: avgOf(sibs, win1.dates) });
         }
-        return { series: out, dates: dates, scopeLabel: (branch ? branch.name : '') + ' · ' + kw.text, focus: focus };
+        return {
+          series: out, dates: win1.dates, trimmed: win1.trimmed, first: win1.first,
+          scopeLabel: (branch ? branch.name : '') + ' · ' + kw.text, focus: focus
+        };
       }
       ui.focus = { type: 'all' };
     }
@@ -1904,11 +1952,15 @@ body.modal-open{overflow:hidden}
       var br = Store.branchOf(focus.id);
       if (br) {
         var kws = Store.keywordsOf(br.id);
+        var win2 = windowOf(kws, date, range);
         kws.forEach(function (k, i) {
-          out.push({ id: k.id, label: k.text, color: PALETTE[i % PALETTE.length], points: Store.seriesOf(k, date, range) });
+          out.push({ id: k.id, label: k.text, color: PALETTE[i % PALETTE.length], points: pointsOf(k, win2.dates) });
         });
-        if (kws.length > 1) out.push({ id: 'avg', label: '지점 평균', color: '#5b667e', dash: true, points: avgSeries(kws, dates) });
-        return { series: out, dates: dates, scopeLabel: br.name + ' · 키워드 ' + kws.length + '개', focus: focus };
+        if (kws.length > 1) out.push({ id: 'avg', label: '지점 평균', color: '#5b667e', dash: true, points: avgOf(kws, win2.dates) });
+        return {
+          series: out, dates: win2.dates, trimmed: win2.trimmed, first: win2.first,
+          scopeLabel: br.name + ' · 키워드 ' + kws.length + '개', focus: focus
+        };
       }
       ui.focus = { type: 'all' };
     }
@@ -1917,15 +1969,46 @@ body.modal-open{overflow:hidden}
     var measured = list.map(function (k) { return { k: k, r: Store.rankOn(k, date) }; })
       .filter(function (x) { return x.r !== null; })
       .sort(function (a, b) { return a.r - b.r; });
+    var win3 = windowOf(measured.slice(0, 3).map(function (x) { return x.k; }), date, range);
     measured.slice(0, 3).forEach(function (x, i) {
       out.push({
         id: x.k.id,
         label: x.k.text,
         color: PALETTE[i % PALETTE.length],
-        points: Store.seriesOf(x.k, date, range)
+        points: pointsOf(x.k, win3.dates)
       });
     });
-    return { series: out, dates: dates, scopeLabel: '전체 ' + list.length + '개 키워드 중 상위 3개 · 키워드를 누르면 개별 추이', focus: { type: 'all' } };
+    return {
+      series: out, dates: win3.dates, trimmed: win3.trimmed, first: win3.first,
+      scopeLabel: '전체 ' + list.length + '개 키워드 중 상위 3개 · 키워드를 누르면 개별 추이',
+      focus: { type: 'all' }
+    };
+  }
+
+  /* 측정 기록이 하루뿐일 때: 추이 대신 '오늘 순위' 막대로 표시 */
+  function snapshotHTML(series, date) {
+    var maxRank = 5;
+    series.forEach(function (s) {
+      s.points.forEach(function (p) { if (typeof p.rank === 'number' && p.rank > maxRank) maxRank = p.rank; });
+    });
+    maxRank = Math.max(5, Math.min(100, Math.ceil(maxRank / 5) * 5));
+    var rows = series.map(function (s) {
+      var p = null;
+      s.points.forEach(function (x) { if (x.date === date) p = x; });
+      var v = p && typeof p.rank === 'number' ? p.rank : null;
+      var known = !!p;
+      var pos = v === null ? null : Math.min(100, Math.max(0, ((v - 1) / Math.max(1, maxRank - 1)) * 100));
+      return '<div class="snap-row">' +
+        '<span class="snap-label"><i style="background:' + s.color + '"></i><span>' + esc(s.label) + '</span></span>' +
+        '<span class="snap-track">' + (pos === null ? '' :
+          '<b class="snap-mark" style="left:' + pos.toFixed(1) + '%;background:' + s.color + '"></b>') + '</span>' +
+        '<span class="snap-value' + (v === null ? ' none' : '') + '">' +
+        (v !== null ? v + '위' : (known ? '권외' : '미확인')) + '</span>' +
+        '</div>';
+    }).join('');
+    return '<div class="snap-chart">' +
+      '<div class="snap-head"><span>1위</span><span>' + maxRank + '위</span></div>' +
+      rows + '</div>';
   }
 
   function renderChart(ui, date) {
@@ -1941,6 +2024,7 @@ body.modal-open{overflow:hidden}
     }).join('');
 
     document.getElementById('chartScope').innerHTML = esc(data.scopeLabel) +
+      (data.trimmed && data.first ? ' <span class="tiny">· 측정 ' + esc(Store.fmtShort(data.first)) + '부터</span>' : '') +
       (data.focus.type !== 'all' ? ' <button class="btn-link" data-act="focus-all">전체 보기</button>' : '');
     document.getElementById('chartLegend').innerHTML = legend;
 
@@ -1955,6 +2039,21 @@ body.modal-open{overflow:hidden}
       host.innerHTML = '<div class="chart-empty">' + ICON.alert + '<p>표시할 추이를 모두 껐습니다. 범례를 눌러 다시 켜 주세요.</p></div>';
       return;
     }
+
+    /* 측정된 날짜가 하루뿐이면 선 그래프 대신 오늘 순위 막대 */
+    var measuredDates = data.dates.filter(function (d) {
+      return visible.some(function (s) {
+        return s.points.some(function (p) { return p.date === d && typeof p.rank === 'number'; });
+      });
+    });
+    if (measuredDates.length <= 1) {
+      host.innerHTML = snapshotHTML(visible, date);
+      document.getElementById('chartNote').innerHTML = measuredDates.length
+        ? '측정일이 하루뿐이라 ' + Store.fmtShort(date) + ' 순위로 표시합니다 · 다음 측정부터 추이 그래프가 그려집니다'
+        : '이 날짜에는 측정 기록이 없습니다 · 기준일을 옮기거나 순위를 입력해 주세요';
+      return;
+    }
+
     Chart.render(host, {
       series: visible, dates: data.dates, today: date,
       height: window.innerWidth < 760 ? 240 : 316,
@@ -1962,9 +2061,10 @@ body.modal-open{overflow:hidden}
     });
 
     var hasGap = data.series.some(function (s) { return s.points.some(function (p) { return p.rank === null; }); });
-    document.getElementById('chartNote').innerHTML = hasGap
-      ? '1위가 맨 위입니다 · 권외(100위 밖)나 미확인 날짜는 선이 끊깁니다'
-      : '1위가 맨 위입니다 · 점을 눌러도 날짜별 순위가 표시됩니다';
+    var noteBits = ['1위가 맨 위입니다'];
+    if (data.trimmed) noteBits.push('측정을 시작한 ' + Store.fmtShort(data.first) + '부터 표시');
+    noteBits.push(hasGap ? '권외(100위 밖)나 미확인 날짜는 선이 끊깁니다' : '점을 눌러도 날짜별 순위가 표시됩니다');
+    document.getElementById('chartNote').innerHTML = noteBits.join(' · ');
   }
 
   /* -------------------------------------------------------------- insights -- */
@@ -2268,8 +2368,13 @@ body.modal-open{overflow:hidden}
     var bestRiser = m.rows.filter(function (r) { return r.delta !== null && r.delta > 0; }).sort(function (a, b) { return b.delta - a.delta; })[0];
     var worst = m.rows.filter(function (r) { return r.delta !== null && r.delta < 0; }).sort(function (a, b) { return a.delta - b.delta; })[0];
     var comment = [];
-    comment.push('이번 기간 ' + m.count + '개 키워드의 평균 순위는 ' + avgText(m.avg) + '위' +
-      (m.avgDiff === null ? '' : (m.avgDiff > 0 ? '로 전일 대비 ' + m.avgDiff.toFixed(1) + '계단 상승했습니다.' : m.avgDiff < 0 ? '로 전일 대비 ' + Math.abs(m.avgDiff).toFixed(1) + '계단 하락했습니다.' : '로 전일과 같습니다.')));
+    var cmp = m.avgDiff === null
+      ? ' 전일 기록이 없어 등락 비교는 다음 측정부터 반영됩니다.'
+      : ' 전일 기록이 있는 ' + m.paired + '개 키워드 기준으로는 ' +
+        (m.avgDiff > 0 ? '전일 대비 ' + m.avgDiff.toFixed(1) + '계단 상승했습니다.'
+          : m.avgDiff < 0 ? '전일 대비 ' + Math.abs(m.avgDiff).toFixed(1) + '계단 하락했습니다.'
+            : '전일과 같습니다.');
+    comment.push('기준일 측정 ' + m.measured + '개 키워드(관리 ' + m.count + '개)의 평균 순위는 ' + avgText(m.avg) + '위입니다.' + cmp);
     comment.push('Top ' + (Store.state.settings.targetTop || 5) + ' 진입 키워드는 ' + m.top5 + '개(' + m.top5Rate + '%), 목표 순위 달성은 ' + m.met + '개입니다.');
     if (bestRiser) comment.push('가장 큰 상승은 ' + bestRiser.branch.name.replace(bestRiser.brand.name + ' ', '') + '의 “' + bestRiser.kw.text + '”(' + bestRiser.delta + '계단 상승, ' + bestRiser.rank + '위)입니다.');
     if (worst) comment.push('하락 폭이 큰 키워드는 “' + worst.kw.text + '”(' + Math.abs(worst.delta) + '계단 하락, ' + worst.rank + '위)로 다음 주 재점검이 필요합니다.');
@@ -2412,8 +2517,10 @@ body.modal-open{overflow:hidden}
     $('#dayNext').disabled = date >= Store.today();
 
     var brands = Store.state.brands.map(function (b) { return b.name; }).join('·');
+    var measured = Store.state.settings.measuredAt;
     $('#heroSub').innerHTML = brands + ' <b>' + m.branches + '개 지점</b> · <b>' + Store.state.keywords.length +
-      '개 키워드</b>의 네이버 플레이스 순위를 매일 기록합니다.';
+      '개 키워드</b>의 네이버 플레이스 순위를 매일 기록합니다.' +
+      (measured ? ' <span class="tiny">· ' + Views.esc(measured.replace(/-/g, '.')) + ' 실측(광고 제외)</span>' : '');
 
     Views.renderChart(UI, date);
     Views.renderInsights(UI, date);
@@ -2432,12 +2539,17 @@ body.modal-open{overflow:hidden}
       }
     });
     var pill = $('#dataPill');
-    var txt = (s.settings.demo ? '샘플 데이터' : '저장됨') + ' · ' + s.keywords.length + '개 키워드';
+    var measuredAt = s.settings.measuredAt;
+    var label = s.settings.demo ? '샘플 데이터'
+      : (measuredAt ? '실측 ' + String(measuredAt).slice(5).replace('-', '.') : '저장됨');
+    var txt = label + ' · ' + s.keywords.length + '개 키워드';
     $('#dataPillText').textContent = txt;
     pill.classList.toggle('demo', !!s.settings.demo);
     pill.title = s.settings.demo
       ? '화면 확인용 샘플 데이터입니다. 실제 수집 JSON을 가져오면 자동으로 교체됩니다.'
-      : '이 브라우저에 저장된 데이터';
+      : (measuredAt
+        ? '네이버 모바일 플레이스 검색결과(광고 카드 제외) 실측 기준일 ' + measuredAt + ' · 이 브라우저에 저장된 데이터'
+        : '이 브라우저에 저장된 데이터');
     $('#footStamp').innerHTML = at ? ' · 최근 확인 ' + Views.esc(at) : '';
   }
 
