@@ -20,7 +20,12 @@ growthkorea-pages/
 ├─ sync.sh             원본 → 배포본 동기화 (커밋·푸시 없음)
 ├─ deploy.sh           sync → 커밋 → main·gh-pages 푸시 → 접속 확인
 ├─ verify_pages.py     실제 Chromium 로컬 검증 (39개 항목)
-└─ preview/            검증 스크린샷
+├─ verify_live.py      라이브 URL 검증 (1440×900 · 390×844, 52개 항목)
+├─ capture_mobile.py   모바일 섹션 캡처 · 인터랙션(드로어·모달·탭) 확인
+├─ capture_desktop.py  데스크톱 섹션·표 레이아웃 캡처
+├─ anchor_test.py      앵커 이동 시 고정 헤더 가림 확인
+├─ preview/            로컬 검증 스크린샷
+└─ preview-live/       라이브 검증 스크린샷 · 본문 텍스트 덤프(text/)
 ```
 
 ## 배포 방법
@@ -41,7 +46,8 @@ bash work/growthkorea-pages/deploy.sh
 
 GitHub Pages 게시 소스는 **`gh-pages` 브랜치 `/` (root)** 입니다. Pickle의 GitHub 앱 토큰에는 Pages 설정 권한(`pages=write`, `administration=write`)이 없어 API로 소스를 바꿀 수 없기 때문에, `main`과 `gh-pages`를 함께 밀어 넣는 메이트립(`hya910819/matetrip`)과 같은 방식을 씁니다.
 
-> 처음 푸시한 뒤 Pages가 자동으로 켜지지 않으면 저장소 **Settings → Pages → Source: `Deploy from a branch` · Branch: `gh-pages` / `(root)`** 로 한 번만 지정하면 됩니다.
+> 2026-11-26 첫 배포에서 `gh-pages` 푸시 직후 Pages가 **자동 활성화**되었습니다(별도 설정 불필요, `status=built`).
+> 만약 나중에 자동으로 켜지 않으면 저장소 **Settings → Pages → Source: `Deploy from a branch` · Branch: `gh-pages` / `(root)`** 로 한 번만 지정하면 됩니다.
 > 나중에 Source를 `main / (root)`로 바꾸면 `gh-pages` 없이 갱신됩니다.
 
 ## 수정 후 반영
@@ -59,6 +65,18 @@ LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 ve
 ```
 
 로컬 서버(`127.0.0.1:8833`)를 띄워 실제 Chromium으로 확인합니다. 최근 결과 **39/39 통과**.
+
+```bash
+LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 verify_live.py
+```
+
+배포된 라이브 주소를 데스크톱 1440×900 · 모바일 390×844에서 직접 열어 확인합니다. 최근 결과 **52/52 통과** (2026-11-26, 커밋 `af5d554`).
+
+- 홈 · 순위 대시보드 · 메이트립 모두 HTTP 200 · 가로 스크롤 없음(`scrollWidth == innerWidth`) · 뷰포트 밖으로 삐져나온 요소 0건
+- 버튼/링크: `체험단 사이트 보기` 클릭 → `https://hya910819.github.io/matetrip/` 새 탭 이동(PC·모바일 모두) · nav 앵커 이동 · 모바일 드로어 · 서비스 아코디언 · `순위 입력` 모달 · `지점·키워드`/`리포트` 탭
+- 앵커 이동 시 섹션 제목이 고정 헤더에 가리지 않음(데스크톱 208px / 모바일 144px 아래에서 시작)
+- 콘솔 오류 0 · 페이지 오류 0 · 실패 요청 0
+- 본문 텍스트는 `preview-live/text/*.txt`로 덤프해 오탈자를 직접 검수(2026-11-26 `타기팅` → `타겟팅` 1건 수정)
 
 - `/` 200 · 히어로·섹션 5개·3D 캔버스(WebGL) 초기화 · 로컬 에셋 4개 200 · 가로 스크롤 없음(1440·390)
 - `체험단 사이트 보기` → `https://hya910819.github.io/matetrip/` (`target="_blank" rel="noopener"`), 클릭 시 실제 이동 확인
