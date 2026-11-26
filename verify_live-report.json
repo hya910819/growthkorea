@@ -1,0 +1,348 @@
+{
+  "targets": {
+    "home": "https://hya910819.github.io/growthkorea/",
+    "rank": "https://hya910819.github.io/growthkorea/rank/",
+    "matetrip": "https://hya910819.github.io/matetrip/"
+  },
+  "screens": {
+    "home": {
+      "desktop": {
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "clientWidth": 1440,
+        "scrollHeight": 9217,
+        "badCount": 0,
+        "bad": []
+      },
+      "mobile": {
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "clientWidth": 390,
+        "scrollHeight": 8945,
+        "badCount": 0,
+        "bad": []
+      }
+    },
+    "rank": {
+      "desktop": {
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "clientWidth": 1440,
+        "scrollHeight": 2126,
+        "badCount": 0,
+        "bad": [],
+        "table": {
+          "left": 83,
+          "right": 1357,
+          "w": 1274,
+          "innerWidth": 1440
+        }
+      },
+      "mobile": {
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "clientWidth": 390,
+        "scrollHeight": 3982,
+        "badCount": 0,
+        "bad": [],
+        "table": {
+          "left": 0,
+          "right": 0,
+          "w": 0,
+          "innerWidth": 390
+        }
+      }
+    },
+    "matetrip": {
+      "desktop": {
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "clientWidth": 1440,
+        "scrollHeight": 2882,
+        "badCount": 0,
+        "bad": []
+      },
+      "mobile": {
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "clientWidth": 390,
+        "scrollHeight": 5938,
+        "badCount": 0,
+        "bad": []
+      }
+    }
+  },
+  "checks": [
+    {
+      "name": "HTTP 200 · home",
+      "ok": true,
+      "detail": "HTTP 200 · https://hya910819.github.io/growthkorea/"
+    },
+    {
+      "name": "HTTP 200 · rank",
+      "ok": true,
+      "detail": "HTTP 200 · https://hya910819.github.io/growthkorea/rank/"
+    },
+    {
+      "name": "HTTP 200 · matetrip",
+      "ok": true,
+      "detail": "HTTP 200 · https://hya910819.github.io/matetrip/"
+    },
+    {
+      "name": "home-desktop · HTTP 상태",
+      "ok": true,
+      "detail": "200"
+    },
+    {
+      "name": "home-desktop · 가로 스크롤 없음 (scrollWidth<=innerWidth)",
+      "ok": true,
+      "detail": "scrollWidth=1440 innerWidth=1440"
+    },
+    {
+      "name": "home-desktop · 뷰포트 밖 요소 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "home-desktop · 표기 기계 검사",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "home-desktop · 히어로 h1 표시",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "home-desktop · 히어로 문구",
+      "ok": true,
+      "detail": "브랜드는 혼자자라지 않습니다."
+    },
+    {
+      "name": "home-desktop · 체험단 링크 href",
+      "ok": true,
+      "detail": "https://hya910819.github.io/matetrip/"
+    },
+    {
+      "name": "home-desktop · 체험단 링크 target",
+      "ok": true,
+      "detail": "_blank"
+    },
+    {
+      "name": "home-desktop · 체험단 링크 클릭 → 메이트립 이동",
+      "ok": true,
+      "detail": "https://hya910819.github.io/matetrip/"
+    },
+    {
+      "name": "home-desktop · nav #services 앵커 스크롤",
+      "ok": true,
+      "detail": "scrollY=4073"
+    },
+    {
+      "name": "home-desktop · 3D 캔버스·라이브러리",
+      "ok": true,
+      "detail": "{\"canvas\": true, \"gl\": true, \"three\": true, \"gsap\": true}"
+    },
+    {
+      "name": "home-mobile · HTTP 상태",
+      "ok": true,
+      "detail": "200"
+    },
+    {
+      "name": "home-mobile · 가로 스크롤 없음 (scrollWidth<=innerWidth)",
+      "ok": true,
+      "detail": "scrollWidth=390 innerWidth=390"
+    },
+    {
+      "name": "home-mobile · 뷰포트 밖 요소 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "home-mobile · 표기 기계 검사",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "home-mobile · 히어로 h1 표시",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "home-mobile · 히어로 문구",
+      "ok": true,
+      "detail": "브랜드는 혼자자라지 않습니다."
+    },
+    {
+      "name": "home-mobile · 체험단 링크 href(모바일)",
+      "ok": true,
+      "detail": "https://hya910819.github.io/matetrip/"
+    },
+    {
+      "name": "home-mobile · 체험단 링크 클릭 → 메이트립 이동",
+      "ok": true,
+      "detail": "https://hya910819.github.io/matetrip/"
+    },
+    {
+      "name": "home-mobile · 3D 캔버스·라이브러리",
+      "ok": true,
+      "detail": "{\"canvas\": true, \"gl\": true, \"three\": true, \"gsap\": true}"
+    },
+    {
+      "name": "rank-desktop · HTTP 상태",
+      "ok": true,
+      "detail": "200"
+    },
+    {
+      "name": "rank-desktop · 가로 스크롤 없음 (scrollWidth<=innerWidth)",
+      "ok": true,
+      "detail": "scrollWidth=1440 innerWidth=1440"
+    },
+    {
+      "name": "rank-desktop · 뷰포트 밖 요소 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "rank-desktop · 표기 기계 검사",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rank-desktop · KPI 렌더",
+      "ok": true,
+      "detail": "kpi 31개"
+    },
+    {
+      "name": "rank-desktop · 순위표 행",
+      "ok": true,
+      "detail": "17행"
+    },
+    {
+      "name": "rank-desktop · 그로스코리아 표기",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rank-mobile · HTTP 상태",
+      "ok": true,
+      "detail": "200"
+    },
+    {
+      "name": "rank-mobile · 가로 스크롤 없음 (scrollWidth<=innerWidth)",
+      "ok": true,
+      "detail": "scrollWidth=390 innerWidth=390"
+    },
+    {
+      "name": "rank-mobile · 뷰포트 밖 요소 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "rank-mobile · 표기 기계 검사",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rank-mobile · KPI 렌더",
+      "ok": true,
+      "detail": "kpi 31개"
+    },
+    {
+      "name": "rank-mobile · 순위표 행",
+      "ok": true,
+      "detail": "17행"
+    },
+    {
+      "name": "rank-mobile · 그로스코리아 표기",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "matetrip-desktop · HTTP 상태",
+      "ok": true,
+      "detail": "200"
+    },
+    {
+      "name": "matetrip-desktop · 가로 스크롤 없음 (scrollWidth<=innerWidth)",
+      "ok": true,
+      "detail": "scrollWidth=1440 innerWidth=1440"
+    },
+    {
+      "name": "matetrip-desktop · 뷰포트 밖 요소 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "matetrip-desktop · 표기 기계 검사",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "matetrip-desktop · 본문 렌더",
+      "ok": true,
+      "detail": "2645자"
+    },
+    {
+      "name": "matetrip-desktop · 링크 렌더",
+      "ok": true,
+      "detail": "a 3개"
+    },
+    {
+      "name": "matetrip-mobile · HTTP 상태",
+      "ok": true,
+      "detail": "200"
+    },
+    {
+      "name": "matetrip-mobile · 가로 스크롤 없음 (scrollWidth<=innerWidth)",
+      "ok": true,
+      "detail": "scrollWidth=390 innerWidth=390"
+    },
+    {
+      "name": "matetrip-mobile · 뷰포트 밖 요소 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "matetrip-mobile · 표기 기계 검사",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "matetrip-mobile · 본문 렌더",
+      "ok": true,
+      "detail": "2579자"
+    },
+    {
+      "name": "matetrip-mobile · 링크 렌더",
+      "ok": true,
+      "detail": "a 3개"
+    },
+    {
+      "name": "콘솔 오류 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "페이지 오류 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "실패 요청 0건",
+      "ok": true,
+      "detail": "[]"
+    }
+  ],
+  "passed": 52,
+  "total": 52,
+  "console_errors": [],
+  "page_errors": [],
+  "failed_requests": []
+}
