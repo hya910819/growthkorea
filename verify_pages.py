@@ -252,6 +252,7 @@ def main():
             "page_errors": page_errors,
             "failed_local": failed_local,
             "failed_external": failed_external,
+            "note": "home-offline 화면에서 기록된 외부 리소스 실패는 CDN 차단 테스트(의도된 결과)이며, 판정에서는 제외했습니다.",
         }
     )
     (ROOT / "verify_pages-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

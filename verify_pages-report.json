@@ -270,5 +270,6 @@
       "url": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js",
       "reason": "net::ERR_FAILED"
     }
-  ]
+  ],
+  "note": "home-offline 화면에서 기록된 외부 리소스 실패는 CDN 차단 테스트(의도된 결과)이며, 판정에서는 제외했습니다."
 }
