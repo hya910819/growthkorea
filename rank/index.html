@@ -2340,7 +2340,13 @@ body.modal-open{overflow:hidden}
       : (Store.state.brands.filter(function (b) { return b.id === scope.brand; })[0] || {}).name;
     var title = (scope.title || brandName + ' 플레이스 순위 보고').trim();
     var dates = Store.daysEnding(date, 14);
-    var period = Store.fmtFull(dates[0]) + ' ~ ' + Store.fmtFull(date);
+    var firstRec = null;
+    list.forEach(function (k) {
+      Object.keys(k.records || {}).forEach(function (d) { if (d <= date && (!firstRec || d < firstRec)) firstRec = d; });
+    });
+    var from = firstRec && firstRec > dates[0] ? firstRec : dates[0];
+    var period = from === date ? Store.fmtFull(date) + ' 기준'
+      : Store.fmtFull(from) + ' ~ ' + Store.fmtFull(date);
 
     var groups = groupRows(m.rows, 'default');
 
