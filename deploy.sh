@@ -39,7 +39,13 @@ else
 fi
 
 echo "== 4) main · gh-pages 푸시"
-git push origin main
+if ! git push -u origin main 2>/tmp/gk_push.log; then
+  cat /tmp/gk_push.log >&2
+  echo "원격 main 에 이미 다른 커밋이 있어 푸시가 거절되었습니다."
+  echo "  · 원격에 의미 있는 작업이 없다면: git push --force origin main"
+  echo "  · 남길 작업이 있다면: git fetch origin main && git rebase origin/main (README.md 충돌 시 정리) 후 다시 실행"
+  exit 1
+fi
 git branch -f gh-pages main
 git push origin gh-pages --force
 
