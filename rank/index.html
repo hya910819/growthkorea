@@ -1,0 +1,3014 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>지점별 플레이스 순위 관리 · 그로스코리아</title>
+<meta name="description" content="룸의정석·와그자그·논다노래타운 지점별 네이버 플레이스 키워드 순위를 매일 기록하고 보고하는 그로스코리아 내부 대시보드">
+<meta name="theme-color" content="#f4f6fb">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%232f4bff'/%3E%3Cpath d='M8 23V12M14 23V8M20 23v-7M26 23H6' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<style>
+/* =========================================================================
+   그로스코리아 (GROWTH KOREA) — 지점별 플레이스 순위 대시보드
+   styles.css
+   ========================================================================= */
+
+:root{
+  --primary:#2f4bff; --primary-2:#6a4dff; --primary-700:#1f37d6;
+  --primary-050:#eef1ff; --primary-100:#dfe5ff;
+  --ink:#0e1526; --ink-2:#26304a; --muted:#5b667e; --muted-2:#8a93a7;
+  --line:#e7eaf3; --line-2:#f1f3f9; --bg:#f4f6fb; --surface:#fff;
+  --green:#0b9b6b; --green-bg:#e8f8f1; --green-line:#c7ecdd;
+  --red:#d93a3a; --red-bg:#fdeeee; --red-line:#f6d3d3;
+  --amber:#a86a00; --amber-bg:#fff4e0; --amber-line:#f6e3bb;
+  --violet:#7a4dff; --violet-bg:#f1ecff;
+  --gold-1:#b8860b; --gold-bg:linear-gradient(135deg,#fff5d6,#ffe9a8);
+  --shadow-xs:0 1px 2px rgba(14,21,38,.05);
+  --shadow-sm:0 2px 6px rgba(14,21,38,.05),0 1px 2px rgba(14,21,38,.04);
+  --shadow-md:0 18px 40px -24px rgba(21,34,74,.34),0 4px 12px -8px rgba(21,34,74,.10);
+  --shadow-lg:0 44px 90px -34px rgba(16,26,58,.42),0 14px 28px -18px rgba(16,26,58,.2);
+  --r-xl:24px; --r-lg:18px; --r-md:14px; --r-sm:10px;
+  --topbar-h:68px; --max:1320px;
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕","Noto Sans KR","Noto Sans CJK KR","Helvetica Neue",Arial,sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+  font-size:14.5px;line-height:1.6;letter-spacing:-.012em;
+  word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(900px 380px at 12% -8%,rgba(47,75,255,.07),transparent 60%),
+                   radial-gradient(700px 320px at 92% -4%,rgba(122,77,255,.06),transparent 62%);
+  background-repeat:no-repeat;
+}
+img,svg{max-width:100%}
+h1,h2,h3,h4,p,ul,ol,figure,dl,dd{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+table{border-collapse:collapse;width:100%}
+:focus-visible{outline:3px solid rgba(47,75,255,.38);outline-offset:2px;border-radius:8px}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hidden{display:none!important}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.tiny{font-size:11.5px;color:var(--muted-2);font-weight:600}
+.t-up{color:var(--green)}
+.t-down{color:var(--red)}
+.show-sm{display:none}
+.only-mobile{display:none}
+
+/* ============================== topbar ================================== */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.88);
+  backdrop-filter:saturate(180%) blur(16px);-webkit-backdrop-filter:saturate(180%) blur(16px);
+  border-bottom:1px solid rgba(231,234,243,.9)}
+.topbar-inner{max-width:var(--max);margin:0 auto;padding:0 22px;height:var(--topbar-h);display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.brand-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(140deg,#2f4bff,#7a5cff);
+  display:grid;place-items:center;box-shadow:0 8px 18px -10px rgba(47,75,255,.9);flex:0 0 auto}
+.brand-mark svg{width:18px;height:18px}
+.brand-text{display:flex;flex-direction:column;line-height:1.12}
+.brand-text strong{font-size:15px;font-weight:800;letter-spacing:.08em}
+.brand-text span{font-size:9.5px;font-weight:800;color:var(--muted-2);letter-spacing:.1em}
+.tabs{display:flex;align-items:center;gap:3px;background:#f2f4fa;border:1px solid var(--line);padding:4px;border-radius:13px;margin-left:4px}
+.tab{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:9px;font-size:13px;font-weight:700;color:var(--muted);transition:.16s;white-space:nowrap}
+.tab svg{width:15px;height:15px;stroke-width:1.9}
+.tab:hover{color:var(--ink)}
+.tab.on{background:#fff;color:var(--ink);box-shadow:var(--shadow-sm)}
+.tab.on svg{color:var(--primary)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px;min-width:0}
+.data-pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;
+  background:#f7f8fc;border:1px solid var(--line);font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+.data-pill .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(11,155,107,.14)}
+.data-pill.demo .dot{background:#e6a700;box-shadow:0 0 0 3px rgba(230,167,0,.16)}
+.icon-btn{width:36px;height:36px;border-radius:10px;display:inline-grid;place-items:center;color:var(--muted);border:1px solid transparent;transition:.16s;flex:0 0 auto}
+.icon-btn:hover{background:#f2f4fa;color:var(--ink)}
+.icon-btn svg{width:17px;height:17px}
+.icon-btn.sm{width:29px;height:29px;border-radius:8px}
+.icon-btn.sm svg{width:14px;height:14px}
+.icon-btn.danger:hover{background:var(--red-bg);color:var(--red)}
+.icon-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ============================== layout ================================= */
+.main{max-width:var(--max);margin:0 auto;padding:0 22px 72px}
+.page{animation:fade .26s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;padding:30px 2px 20px;flex-wrap:wrap}
+.hero-copy h1{font-size:30px;font-weight:800;letter-spacing:-.045em;margin-top:12px;line-height:1.22}
+.hero-copy p{font-size:13.5px;color:var(--muted);margin-top:8px;max-width:640px}
+.hero-copy p b{color:var(--ink-2);font-weight:700}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;height:27px;padding:0 11px 0 9px;border-radius:999px;
+  background:#fff;border:1px solid var(--line);font-size:10.5px;font-weight:800;letter-spacing:.06em;color:#3d4a66;box-shadow:var(--shadow-xs)}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 3px rgba(47,75,255,.14)}
+.daynav{display:flex;align-items:center;gap:2px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:4px 4px;box-shadow:var(--shadow-xs)}
+.daynav-label{display:flex;flex-direction:column;align-items:center;min-width:126px;line-height:1.25;padding:0 6px}
+.daynav-label b{font-size:13px;font-weight:800;letter-spacing:-.02em}
+.daynav-label span{font-size:10.5px;font-weight:700;color:var(--muted-2)}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:30px 2px 18px}
+.page-head h1{font-size:27px;font-weight:800;letter-spacing:-.045em;margin-top:11px}
+.page-head p{font-size:13px;color:var(--muted);margin-top:7px}
+.head-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ============================== buttons ================================ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:42px;padding:0 17px;border-radius:12px;
+  font-size:13.5px;font-weight:700;letter-spacing:-.01em;transition:.16s;white-space:nowrap;border:1px solid transparent}
+.btn svg{width:16px;height:16px;flex:0 0 auto}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(135deg,#2f4bff,#5b48ff);color:#fff;box-shadow:0 12px 22px -14px rgba(47,75,255,.95)}
+.btn.primary:hover{box-shadow:0 16px 28px -14px rgba(47,75,255,1);transform:translateY(-1px)}
+.btn.dark{background:var(--ink);color:#fff}
+.btn.dark:hover{background:#1b2438}
+.btn.ghost{background:#fff;border-color:var(--line);color:var(--ink-2);box-shadow:var(--shadow-xs)}
+.btn.ghost:hover{border-color:#cbd3e6;background:#fcfdff}
+.btn.soft{background:var(--primary-050);color:var(--primary-700);border-color:var(--primary-100)}
+.btn.soft:hover{background:#e6ebff}
+.btn.danger{background:#fff;border-color:#f2cfcf;color:#bf2f2f}
+.btn.danger:hover{background:#fdf4f4}
+.btn.sm{height:35px;padding:0 12px;font-size:12.5px;border-radius:10px}
+.btn.xs{height:28px;padding:0 9px;font-size:11px;border-radius:8px;gap:4px}
+.btn.xs svg{width:12px;height:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--primary);padding:2px}
+.btn-link:hover{text-decoration:underline;text-underline-offset:3px}
+
+/* ============================== cards ================================== */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 20px 14px;flex-wrap:wrap}
+.card-head h2{font-size:16px;font-weight:800;letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
+.card-head p{font-size:12px;color:var(--muted);margin-top:4px;max-width:620px}
+.count{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:6px;background:var(--primary-050);
+  color:var(--primary-700);font-size:11px;font-weight:800;letter-spacing:0}
+
+/* ============================== KPI ==================================== */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 17px 15px;box-shadow:var(--shadow-xs);
+  position:relative;overflow:hidden;transition:.18s}
+.kpi:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.kpi::after{content:"";position:absolute;inset:0 0 auto 0;height:2.5px;background:linear-gradient(90deg,#2f4bff,#8a6bff);opacity:0}
+.kpi.accent{background:linear-gradient(168deg,#fff 30%,#f4f7ff);border-color:#dfe5ff}
+.kpi.accent::after{opacity:1}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kpi-label{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.01em}
+.kpi-ico{width:26px;height:26px;border-radius:8px;background:#f5f7fd;display:grid;place-items:center;color:#7b87a4}
+.kpi-ico svg{width:14px;height:14px}
+.kpi.accent .kpi-ico{background:var(--primary-050);color:var(--primary)}
+.kpi-value{font-size:28px;font-weight:800;letter-spacing:-.05em;line-height:1.15;margin-top:9px;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.kpi-value .unit{font-size:11.5px;font-weight:700;color:var(--muted-2);letter-spacing:-.01em}
+.kpi-sub{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+.kpi-sub b{color:var(--ink-2);font-weight:800}
+.move-bar{display:flex;height:5px;border-radius:99px;overflow:hidden;background:#eef1f8;margin:3px 0 4px}
+.move-bar i{display:block;height:100%}
+.move-legend{font-size:10.5px;color:var(--muted-2);font-weight:700}
+
+/* ============================== filter ================================= */
+.filter-card{margin-top:14px;padding:13px 16px 11px}
+.filter-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.chips{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;height:33px;padding:0 11px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;font-size:12.5px;font-weight:700;color:var(--muted);transition:.15s;white-space:nowrap}
+.chip span{font-size:10.5px;font-weight:800;color:var(--muted-2);background:#f2f4fa;border-radius:5px;padding:1px 5px}
+.chip:hover{border-color:#cbd3e6;color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.on span{background:rgba(255,255,255,.18);color:#fff}
+.chip-dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.chip.on .chip-dot{box-shadow:0 0 0 2px rgba(255,255,255,.55)}
+.search{display:flex;align-items:center;gap:7px;height:35px;padding:0 11px;border:1px solid var(--line);border-radius:10px;background:#fff;flex:1 1 190px;min-width:150px}
+.search svg{width:15px;height:15px;color:var(--muted-2);flex:0 0 auto}
+.search input{border:0;outline:0;background:none;width:100%;font-size:13px;min-width:0}
+.search input::placeholder{color:#a3abbd}
+.select{position:relative;display:inline-flex;align-items:center}
+.select select{height:35px;padding:0 30px 0 11px;border:1px solid var(--line);border-radius:10px;background:#fff;
+  font-size:12.5px;font-weight:700;color:var(--ink-2);appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a93a7' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;max-width:260px}
+.filter-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px;font-size:11.5px;color:var(--muted);font-weight:600;flex-wrap:wrap}
+.filter-meta .sep{color:#c3cadb;font-style:normal;padding:0 3px}
+
+/* ============================== chart ================================== */
+.dash-grid{display:grid;grid-template-columns:minmax(0,1fr) 348px;gap:14px;margin-top:14px}
+.chart-card{display:flex;flex-direction:column;min-width:0}
+.chart-head{align-items:center}
+.chart-head h2{font-size:17px}
+.chart-head p{font-size:12px;margin-top:3px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.seg{display:inline-flex;background:#f2f4fa;border:1px solid var(--line);border-radius:9px;padding:2px}
+.seg button{height:27px;padding:0 10px;border-radius:7px;font-size:11.5px;font-weight:800;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow-xs)}
+.legend-row{display:flex;flex-wrap:wrap;gap:6px;padding:0 20px 4px}
+.legend{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 8px;border-radius:7px;border:1px solid var(--line);
+  font-size:11px;font-weight:700;color:var(--ink-2);background:#fff}
+.legend i{width:8px;height:8px;border-radius:3px}
+.legend.off{opacity:.42;text-decoration:line-through}
+.chart-wrap{position:relative;padding:4px 10px 0;min-height:240px}
+.chart-canvas{width:100%}
+.chart{display:block;width:100%;height:auto;overflow:visible}
+.grid-line{stroke:#eef1f8;stroke-width:1}
+.axis-y{font-size:10px;fill:#98a1b5;font-weight:700}
+.axis-caption{font-size:9.5px;fill:#b3bacb;font-weight:800;letter-spacing:.02em}
+.axis-x{font-size:10px;fill:#98a1b5;font-weight:700}
+.axis-x.is-today{fill:var(--primary);font-weight:800}
+.series-line{transition:opacity .2s}
+.dot{stroke:#fff;stroke-width:1.6}
+.dot.is-last{stroke-width:2.4;filter:drop-shadow(0 2px 4px rgba(14,21,38,.18))}
+.chart-tip{position:absolute;z-index:5;pointer-events:none;background:rgba(14,21,38,.94);color:#fff;border-radius:10px;
+  padding:8px 10px;font-size:11px;box-shadow:var(--shadow-md);min-width:148px;max-width:240px}
+.chart-tip .tip-date{font-size:10.5px;font-weight:800;color:#b9c2d8;margin-bottom:5px}
+.chart-tip .tip-row{display:flex;align-items:center;gap:6px;line-height:1.6}
+.chart-tip .tip-row b{margin-left:auto;font-variant-numeric:tabular-nums}
+.chart-tip .dot-s{width:6px;height:6px;border-radius:50%;flex:0 0 auto}
+.chart-tip .tip-label{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e7ebf5}
+.chart-note{font-size:10.5px;color:var(--muted-2);padding:4px 20px 16px;font-weight:600}
+.chart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:70px 20px;color:var(--muted-2);text-align:center}
+.chart-empty svg{width:22px;height:22px}
+.chart-empty p{font-size:12px}
+
+/* ============================== insight ================================ */
+.insight{padding:0 0 8px;display:flex;flex-direction:column;min-width:0}
+.insight-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:17px 18px 10px;border-bottom:1px solid var(--line-2)}
+.insight-head h3{font-size:14.5px;font-weight:800;letter-spacing:-.02em}
+.insight-sec{padding:11px 18px 4px}
+.insight-sec h4{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.02em;margin-bottom:5px}
+.insight-sec .dot{width:6px;height:6px;border-radius:50%}
+.dot.up{background:var(--green)} .dot.down{background:var(--red)} .dot.goal{background:var(--amber)} .dot.none{background:#b3bacb}
+.insight-sec ul{display:flex;flex-direction:column}
+.insight-sec li{display:flex;align-items:center;gap:8px;padding:5px 0;border-radius:7px;cursor:pointer;font-size:12.5px}
+.insight-sec li:hover{background:#f7f9ff}
+.ins-kw{display:flex;align-items:center;gap:5px;min-width:0;font-weight:700;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ins-kw em{font-style:normal;font-size:10px;font-weight:700;color:var(--muted-2);background:#f2f4fa;border-radius:5px;padding:1px 4px;flex:0 0 auto}
+.ins-right{margin-left:auto;display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.ins-rank{font-size:10.5px;color:var(--muted-2);font-weight:700}
+.ins-gap{font-size:10.5px;font-weight:800;color:var(--amber);background:var(--amber-bg);border-radius:5px;padding:1px 5px}
+.ins-empty{font-size:11.5px;color:var(--muted-2);padding:2px 0 6px}
+
+/* ============================== table ================================== */
+.table-card{margin-top:14px;overflow:hidden}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rank-table{width:100%;min-width:0;border-collapse:separate;border-spacing:0}
+.rank-table thead th{position:sticky;top:0;background:#fbfcff;font-size:10.5px;font-weight:800;color:var(--muted-2);
+  letter-spacing:.03em;text-align:left;padding:9px 12px;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line);white-space:nowrap}
+.rank-table thead th.th-rank,.rank-table thead th.th-delta{text-align:center}
+.rank-table tbody td{padding:11px 12px;border-bottom:1px solid var(--line-2);font-size:12.5px;vertical-align:middle}
+.branch-row td{background:#f7f9ff;padding:8px 12px;border-bottom:1px solid #e7ecf9;cursor:pointer}
+.branch-row:hover td{background:#f0f4ff}
+.branch-row td>span{vertical-align:middle}
+.b-color{display:inline-block;width:4px;height:15px;border-radius:2px;background:var(--bc);margin-right:8px}
+.branch-row b{font-size:12.5px;font-weight:800;color:var(--ink)}
+.b-area{font-size:11px;color:var(--muted-2);font-weight:600;margin-left:7px}
+.b-stats{font-size:11px;color:var(--muted);font-weight:600;margin-left:14px}
+.b-stats b{font-weight:800;color:var(--ink-2)}
+.b-links{margin-left:14px;display:inline-flex;gap:8px}
+.b-more{margin-left:auto;float:right;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:800;color:var(--primary);opacity:.75}
+.b-more svg{width:12px;height:12px}
+.kw-row:hover td{background:#fafbff}
+.td-kw{min-width:190px}
+.kw-name{font-size:13px;font-weight:800;color:var(--ink);letter-spacing:-.02em;text-align:left}
+.kw-name:hover{color:var(--primary);text-decoration:underline;text-underline-offset:3px}
+.tag{display:inline-flex;align-items:center;height:17px;padding:0 5px;border-radius:5px;font-size:9.5px;font-weight:800;vertical-align:1px;margin-left:5px;letter-spacing:0}
+.tag.is-main{background:var(--primary-050);color:var(--primary-700)}
+.kw-branch{font-size:10.5px;color:var(--muted-2);font-weight:700;margin-left:6px}
+.td-rank{text-align:center;white-space:nowrap}
+.rank-btn{padding:0;display:inline-flex}
+.rank-badge{display:inline-flex;align-items:baseline;justify-content:center;gap:1px;min-width:44px;height:30px;padding:0 8px;
+  border-radius:9px;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:30px;
+  background:#f2f4fa;color:var(--ink-2);transition:.15s;border:1px solid transparent}
+.rank-badge i{font-style:normal;font-size:9.5px;font-weight:700;color:var(--muted-2)}
+.rank-badge.top3{background:linear-gradient(135deg,#fff4cf,#ffe49b);color:#7a5200;border-color:#f4dfa6;box-shadow:0 3px 8px -5px rgba(180,132,0,.6)}
+.rank-badge.top3 i{color:#a57c17}
+.rank-badge.top5{background:var(--primary-050);color:var(--primary-700);border-color:var(--primary-100)}
+.rank-badge.top5 i{color:#6b7ee0}
+.rank-badge.top10{background:var(--violet-bg);color:#5b32cc;border-color:#e3d9ff}
+.rank-badge.top10 i{color:#8b73cf}
+.rank-badge.low{background:#f4f6fb;color:var(--ink-2)}
+.rank-badge.out{font-size:11px;font-weight:800;background:var(--red-bg);color:#b33636;border-color:var(--red-line)}
+.rank-badge.none{font-size:13px;background:#f7f8fc;color:#a9b1c3;border:1px dashed #d9dfec}
+.rank-btn:hover .rank-badge{transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.td-delta{text-align:center;white-space:nowrap;width:76px}
+.delta{display:inline-flex;align-items:center;justify-content:center;height:21px;padding:0 6px;border-radius:6px;
+  font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:0}
+.delta.up{background:var(--green-bg);color:#07805a}
+.delta.down{background:var(--red-bg);color:#bf3030}
+.delta.flat{background:#f2f4fa;color:#8a93a7}
+.delta.na{background:transparent;color:#b9c0d0}
+.prev{display:block;font-size:9.5px;color:var(--muted-2);font-weight:700;margin-top:2px}
+.td-7d{white-space:nowrap;width:150px}
+.bw{font-size:11.5px;font-weight:700;color:var(--ink-2);font-variant-numeric:tabular-nums;margin-right:6px}
+.bw b{color:var(--green);font-weight:800}
+.bw i{font-style:normal;color:#c3cadb;padding:0 2px}
+.spark{vertical-align:middle}
+.spark-empty{color:#c3cadb}
+.td-goal{white-space:nowrap;width:120px}
+.goal{font-size:11.5px;font-weight:800;color:var(--ink-2);margin-right:6px;font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 6px;border-radius:6px;font-size:10px;font-weight:800;white-space:nowrap}
+.badge svg{width:11px;height:11px}
+.badge.met{background:var(--green-bg);color:#07805a}
+.badge.near{background:var(--amber-bg);color:var(--amber)}
+.badge.miss{background:#f4f6fb;color:#8a93a7}
+.badge.na{background:#f7f8fc;color:#b3bacb}
+.td-status{white-space:nowrap}
+.st{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--muted-2)}
+.st svg{width:11px;height:11px}
+.st-auto{color:#6f7c98}
+.st-auto::before{content:"";width:5px;height:5px;border-radius:50%;background:#9aa4bd}
+.st-manual{color:#4e5d7d}
+.st-manual::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--primary)}
+.st-none{color:var(--amber)}
+.st-out{color:#b66a4a}
+.td-link{white-space:nowrap;width:132px}
+.mini-link{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:800;color:var(--primary);padding:3px 5px;border-radius:6px}
+.mini-link svg{width:11px;height:11px}
+.mini-link:hover{background:var(--primary-050)}
+.mini-link.quiet{color:var(--muted);font-weight:700}
+.mini-link.quiet:hover{background:#f4f6fb;color:var(--ink-2)}
+.td-man{width:68px;white-space:nowrap;text-align:right}
+.td-man .icon-btn{color:#98a1b5}
+.td-man .icon-btn:hover{color:var(--ink)}
+.td-man .icon-btn.danger:hover{color:var(--red)}
+.kw-row.is-pending .rank-badge.none{border-style:dashed}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:60px 20px;color:var(--muted)}
+.empty svg{width:26px;height:26px;color:#a9b1c3}
+.empty p{font-size:12.5px;line-height:1.6}
+
+/* =========================== mobile cards ============================== */
+.m-group{margin:0 0 14px}
+.m-group:last-child{margin-bottom:4px}
+.m-branch{display:flex;align-items:center;gap:10px;padding:4px 2px 8px;cursor:pointer}
+.m-branch h3{font-size:14px;font-weight:800;letter-spacing:-.03em;margin-top:3px}
+.m-branch p{font-size:11px;color:var(--muted-2);font-weight:600}
+.brand-tag{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:5px;font-size:9.5px;font-weight:800;letter-spacing:.01em}
+.m-more{margin-left:auto;color:var(--primary);opacity:.7}
+.m-more svg{width:16px;height:16px}
+.kw-card{background:#fff;border:1px solid var(--line);border-left:3px solid var(--bc);border-radius:13px;padding:11px 13px;margin-bottom:8px;box-shadow:var(--shadow-xs)}
+.kw-card.is-pending{border-left-color:var(--amber)}
+.kc-main{display:flex;align-items:flex-start;gap:10px}
+.kc-left{min-width:0;flex:1}
+.kc-left h4{font-size:13.5px;font-weight:800;letter-spacing:-.025em;line-height:1.4}
+.kc-left h4 button{text-align:left}
+.kc-meta{font-size:10.5px;color:var(--muted-2);font-weight:700;margin-top:4px}
+.kc-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:0 0 auto}
+.kc-foot{display:flex;align-items:center;gap:7px;margin-top:9px;padding-top:8px;border-top:1px solid var(--line-2);flex-wrap:wrap}
+.kc-foot .mini-link{margin-left:auto}
+.kc-foot .mini-link + .mini-link{margin-left:0}
+
+/* ============================== manage ================================= */
+.manage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:12px}
+.branch-card{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:15px 16px 13px;box-shadow:var(--shadow-xs);overflow:hidden}
+.branch-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--bc)}
+.bc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bc-place{font-size:9.5px;font-weight:800;color:var(--green);background:var(--green-bg);border-radius:5px;padding:1px 5px}
+.branch-card h3{font-size:15px;font-weight:800;letter-spacing:-.03em;margin-top:8px}
+.bc-area{font-size:11.5px;color:var(--muted-2);font-weight:600;margin-top:2px}
+.bc-stats{display:flex;gap:18px;margin:12px 0 10px;padding:9px 0;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2)}
+.bc-stats div{display:flex;flex-direction:column;line-height:1.2}
+.bc-stats b{font-size:16px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.bc-stats span{font-size:9.5px;font-weight:700;color:var(--muted-2);margin-top:2px}
+.bc-memo{font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:8px}
+.bc-foot{display:flex;align-items:center;gap:6px;margin-top:2px}
+.bc-actions{margin-left:auto;display:flex;gap:2px}
+.add-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:190px;
+  border:1.5px dashed #d3daea;background:#fbfcff;color:var(--muted);box-shadow:none;text-align:center;transition:.16s}
+.add-card:hover{border-color:var(--primary);background:#f7f9ff;color:var(--primary)}
+.add-card::before{display:none}
+.add-ico{width:38px;height:38px;border-radius:12px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;margin-bottom:2px}
+.add-ico svg{width:18px;height:18px}
+.add-card b{font-size:13.5px;font-weight:800;color:var(--ink-2)}
+.add-card span:last-child{font-size:10.5px;color:var(--muted-2)}
+.add-card:hover b{color:var(--primary)}
+.manage-table td{font-size:12.5px}
+.brand-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.data-card{margin-top:14px;padding-bottom:6px}
+.data-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:2px 20px 14px}
+.data-box{border:1px solid var(--line);border-radius:13px;padding:13px 14px;background:#fbfcff}
+.data-box h4{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:var(--ink-2)}
+.data-box h4 svg{width:14px;height:14px;color:var(--primary)}
+.data-box p{font-size:11px;color:var(--muted);margin:5px 0 10px;line-height:1.5}
+.btn-row{display:flex;gap:5px;flex-wrap:wrap}
+.danger-box{background:#fffafa;border-color:#f6e0e0}
+.danger-box h4 svg{color:var(--red)}
+.schema{margin:0 20px 14px;border-top:1px solid var(--line-2);padding-top:10px}
+.schema summary{font-size:11.5px;font-weight:800;color:var(--muted);cursor:pointer}
+.schema pre{margin:9px 0 6px;padding:12px;background:#0e1526;color:#d7e0f5;border-radius:10px;font-size:10.5px;
+  line-height:1.6;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre}
+.schema pre b{color:#8ff0c8}
+
+/* ============================== report ================================= */
+.report-form{margin-bottom:14px;padding:16px 18px 13px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1.8fr 1fr;gap:11px}
+.form-grid .grow{grid-column:auto}
+.form-grid.two{grid-template-columns:1fr 1fr}
+.form-grid.compact{grid-template-columns:1fr 1fr;margin-bottom:9px}
+.report-form label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:800;color:var(--muted)}
+.report-form input,.report-form select{height:38px;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.report-form input:focus,.report-form select:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px rgba(47,75,255,.12)}
+.form-hint{font-size:10.5px;color:var(--muted-2);margin-top:8px;line-height:1.5}
+.report-doc{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:34px 38px 26px;box-shadow:var(--shadow-sm);max-width:960px;margin:0 auto}
+.rd-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.rd-org{display:flex;align-items:center;gap:9px}
+.rd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(140deg,#2f4bff,#7a5cff);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.rd-org div{display:flex;flex-direction:column;line-height:1.15}
+.rd-org b{font-size:13px;font-weight:800;letter-spacing:.06em}
+.rd-org span{font-size:8.5px;font-weight:800;color:var(--muted-2);letter-spacing:.1em}
+.rd-date{font-size:11px;font-weight:800;color:var(--muted)}
+.report-doc h1{font-size:23px;font-weight:800;letter-spacing:-.045em;margin-top:18px;line-height:1.3}
+.rd-period{font-size:11.5px;color:var(--muted);margin-top:5px}
+.rd-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0 20px}
+.rd-kpis div{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fbfcff;display:flex;align-items:baseline;gap:2px;flex-wrap:wrap}
+.rd-kpis span{width:100%;font-size:9.5px;font-weight:800;color:var(--muted-2);margin-bottom:2px}
+.rd-kpis b{font-size:18px;font-weight:800;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.rd-kpis em{font-style:normal;font-size:9.5px;font-weight:700;color:var(--muted-2)}
+.rd-branch{margin-bottom:16px;page-break-inside:avoid}
+.rd-branch-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:5px;border-bottom:1px solid var(--ink);flex-wrap:wrap}
+.rd-branch-head h3{font-size:13.5px;font-weight:800;letter-spacing:-.02em}
+.rd-branch-head span{font-size:10px;color:var(--muted);font-weight:600}
+.rd-table{margin-top:6px}
+.rd-table th{font-size:9.5px;font-weight:800;color:var(--muted-2);text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+.rd-table td{font-size:11px;padding:6px;border-bottom:1px solid var(--line-2);color:var(--ink-2)}
+.rd-table td b{font-variant-numeric:tabular-nums}
+.rd-table .rd-kw{font-weight:800;color:var(--ink)}
+.rd-table tr.pending td{color:var(--amber)}
+.rd-note{border-top:1px solid var(--line);padding-top:12px;margin-top:8px}
+.rd-note h3{font-size:12px;font-weight:800;margin-bottom:6px}
+.rd-note p{font-size:11.5px;line-height:1.75;color:var(--ink-2)}
+.rd-todo{font-size:11px;font-weight:700;color:var(--primary-700);background:var(--primary-050);border-radius:8px;padding:7px 10px;margin-top:8px}
+.rd-foot{display:flex;justify-content:space-between;gap:14px;margin-top:18px;padding-top:9px;border-top:1px solid var(--line-2);font-size:9.5px;color:var(--muted-2);font-weight:600}
+.rd-empty{padding:30px;text-align:center;color:var(--muted)}
+.foot-note{font-size:11px;color:var(--muted-2);margin-top:16px;text-align:center;line-height:1.7}
+.foot-note .btn-link{font-size:11px}
+
+/* ============================== modal ================================== */
+body.modal-open{overflow:hidden}
+.modal-backdrop{position:fixed;inset:0;z-index:100;background:rgba(12,19,35,.46);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .16s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:#fff;border-radius:20px;width:min(560px,100%);max-height:calc(100vh - 40px);display:flex;flex-direction:column;
+  box-shadow:var(--shadow-lg);animation:pop .2s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.modal.wide{width:min(760px,100%)}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:19px 22px 13px;border-bottom:1px solid var(--line-2)}
+.modal-head h3{font-size:17px;font-weight:800;letter-spacing:-.03em}
+.modal-head p{font-size:11.5px;color:var(--muted);margin-top:3px}
+.modal-body{padding:16px 22px;overflow-y:auto}
+.modal-foot{display:flex;justify-content:flex-end;gap:7px;padding:13px 22px 18px;border-top:1px solid var(--line-2)}
+.field{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:11px}
+.field input,.field select,.field textarea{height:40px;padding:0 11px;border:1px solid var(--line);border-radius:10px;background:#fff;
+  font-size:13px;font-weight:600;color:var(--ink);width:100%}
+.field textarea{height:auto;padding:10px 11px;line-height:1.6;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px rgba(47,75,255,.12)}
+.field input:disabled{background:#f5f7fb;color:var(--muted-2)}
+.form-grid.two .field{margin-bottom:11px}
+.check{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--ink-2);margin:3px 0 10px;cursor:pointer}
+.check input{width:15px;height:15px;accent-color:var(--primary);flex:0 0 auto}
+.check.tiny{font-size:10.5px;color:var(--muted);margin:0;white-space:nowrap}
+.input-with-unit{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.input-with-unit input{border:0;box-shadow:none;background:none;height:44px;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.input-with-unit input:focus{box-shadow:none}
+.input-with-unit span{font-size:11.5px;font-weight:800;color:var(--muted-2);padding-right:12px}
+.form-error{background:var(--red-bg);border:1px solid var(--red-line);color:#a92d2d;font-size:11.5px;font-weight:700;
+  padding:8px 11px;border-radius:9px;margin-bottom:10px}
+.rank-edit-head{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fbfcff;border:1px solid var(--line);
+  border-radius:11px;padding:11px 13px;margin-bottom:13px;flex-wrap:wrap}
+.re-now{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;color:var(--muted)}
+.re-delta{display:flex;align-items:center;gap:4px}
+.re-delta small{font-size:10px;color:var(--muted-2)}
+.re-goal{font-size:11px;color:var(--muted);font-weight:600}
+.confirm-text{font-size:13px;line-height:1.7;color:var(--ink-2)}
+.qi-wrap{max-height:44vh;overflow:auto;border:1px solid var(--line);border-radius:11px}
+.qi-table th{position:sticky;top:0;background:#fbfcff;font-size:10px;font-weight:800;color:var(--muted-2);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+.qi-table td{padding:6px 10px;border-bottom:1px solid var(--line-2);font-size:12px;vertical-align:middle}
+.qi-table tr:last-child td{border-bottom:0}
+.qi-branch{color:var(--muted);font-size:10.5px;font-weight:700;white-space:nowrap}
+.qi-kw{display:flex;flex-direction:column;line-height:1.3}
+.qi-kw span{font-size:9.5px;color:var(--muted-2);font-weight:700}
+.qi-input input{width:74px;height:32px;border:1px solid var(--line);border-radius:8px;padding:0 8px;font-size:12.5px;font-weight:700;text-align:center}
+.qi-input input:focus{outline:0;border-color:var(--primary);box-shadow:0 0 0 3px rgba(47,75,255,.12)}
+.qi-input input:disabled{background:#f5f7fb;color:#b3bacb}
+.qi-out{width:58px}
+@media (max-width:560px){
+  .qi-branch,.qi-table thead th:nth-child(1){display:none}
+  .qi-input input{width:62px}
+  .qi-out{width:44px}
+  .qi-table td{padding:6px 7px;font-size:11.5px}
+  .qi-table th{padding:7px}
+}
+.imp-result{margin-top:11px;padding:10px 12px;border-radius:10px;font-size:11.5px;font-weight:700;line-height:1.6}
+.imp-result.ok{background:var(--green-bg);border:1px solid var(--green-line);color:#07734f}
+.imp-result b{font-weight:800}
+.imp-errors{margin-top:5px;padding-left:14px;list-style:disc;font-weight:600;color:#955}
+.file-field input{height:auto;padding:8px;font-size:11.5px;background:#fbfcff}
+
+/* ============================== toast ================================== */
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:200;display:flex;align-items:center;gap:8px;
+  background:rgba(14,21,38,.95);color:#fff;font-size:12.5px;font-weight:700;padding:11px 16px;border-radius:12px;
+  box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:.24s;max-width:calc(100vw - 32px)}
+.toast svg{width:15px;height:15px;color:#7fe0b6;flex:0 0 auto}
+.toast.error svg{color:#ff9b9b}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ============================== responsive ============================= */
+@media (max-width:1180px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .dash-grid{grid-template-columns:minmax(0,1fr)}
+  .insight{display:grid;grid-template-columns:repeat(2,1fr);gap:0 8px;padding-bottom:12px}
+  .insight-head{grid-column:1/-1}
+  .data-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:980px){
+  .brand-text span{display:none}
+  .topbar-inner{gap:12px}
+  .tab{padding:0 11px}
+  .data-pill{display:none}
+}
+@media (max-width:860px){
+  .topbar-inner{height:auto;padding:9px 14px;display:grid;grid-template-columns:1fr auto;grid-template-areas:"brand actions" "tabs tabs";gap:8px 10px}
+  .brand{grid-area:brand}
+  .top-actions{grid-area:actions}
+  .tabs{grid-area:tabs;width:100%;margin:0;justify-content:space-between}
+  .tab{flex:1;justify-content:center;height:34px;padding:0 8px;font-size:12.5px}
+  .tab svg{width:14px;height:14px}
+  .main{padding:0 14px 64px}
+  .hero{padding:20px 0 14px;align-items:flex-start}
+  .hero-copy h1{font-size:24px;margin-top:10px}
+  .hero-copy p{font-size:12.5px}
+  .daynav{width:100%;justify-content:space-between}
+  .daynav-label{flex:1}
+  .page-head h1{font-size:23px}
+  .page-head{padding:22px 0 14px}
+  .hide-sm{display:none}
+  .show-sm{display:inline}
+  .btn{padding:0 13px}
+  .btn.primary.sm{height:33px;font-size:12px;border-radius:10px}
+  .only-desktop{display:none}
+  .only-mobile{display:block;padding:0 14px 14px}
+  .form-grid{grid-template-columns:1fr 1fr}
+  .form-grid .grow{grid-column:span 2}
+  .data-grid{grid-template-columns:1fr}
+  .report-doc{padding:20px 16px 18px;border-radius:14px}
+  .rd-kpis{grid-template-columns:repeat(3,1fr)}
+  .rd-kpis div:nth-child(4),.rd-kpis div:nth-child(5){margin-top:0}
+  .rd-foot{flex-direction:column;gap:4px}
+  .modal-backdrop{padding:0;align-items:flex-end}
+  .modal,.modal.wide{width:100%;max-height:92vh;border-radius:20px 20px 0 0}
+  .modal-head{padding:16px 16px 11px}
+  .modal-body{padding:13px 16px}
+  .modal-foot{padding:11px 16px 16px}
+  .toast{bottom:18px;font-size:12px}
+}
+@media (max-width:560px){
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:9px}
+  .kpi-grid .kpi:last-child:nth-child(odd){grid-column:span 2}
+  .kpi{padding:13px 13px 12px;border-radius:15px}
+  .kpi-value{font-size:23px;margin-top:7px}
+  .kpi-sub{font-size:10.5px}
+  .filter-card{padding:11px 12px 9px}
+  .filter-row{gap:7px}
+  .chips{flex-wrap:wrap;width:100%;gap:6px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{height:31px;font-size:11.5px;padding:0 10px}
+  .search{flex:1 1 100%;order:0}
+  .select{flex:1 1 calc(50% - 4px)}
+  .select select{width:100%;max-width:none}
+  .chart-head{padding:15px 14px 8px}
+  .legend-row{padding:0 14px 2px}
+  .chart-wrap{padding:2px 4px 0;min-height:230px}
+  .chart-note{padding:2px 14px 13px}
+  .insight{grid-template-columns:1fr}
+  .insight-head{padding:15px 15px 8px}
+  .insight-sec{padding:9px 15px 2px}
+  .card-head{padding:15px 14px 11px}
+  .card-head h2{font-size:14.5px}
+  .card-head p{font-size:11px}
+  .manage-grid{grid-template-columns:1fr}
+  .bc-stats{gap:22px}
+  .form-grid,.form-grid.two{grid-template-columns:1fr}
+  .form-grid .grow{grid-column:span 1}
+  .rd-kpis{grid-template-columns:1fr 1fr}
+  .rd-kpis div:last-child:nth-child(odd){grid-column:span 2}
+  .rd-table th:nth-child(4),.rd-table td:nth-child(4),.rd-table th:nth-child(7),.rd-table td:nth-child(7){display:none}
+  .report-form{padding:13px 14px 9px}
+  .foot-note{font-size:10.5px}
+}
+
+/* ============================== print ================================== */
+@page{size:A4;margin:10mm 11mm}
+@media print{
+  body{background:#fff;font-size:10.5pt}
+  .no-print,.topbar,.foot-note,.toast,.modal-backdrop,.report-controls,.report-form{display:none!important}
+  .main{max-width:none;padding:0}
+  .page{display:none!important;animation:none}
+  #page-report{display:block!important}
+  .report-doc{border:0;box-shadow:none;border-radius:0;padding:0;max-width:none}
+  .rd-kpis{grid-template-columns:repeat(5,1fr)!important;margin:11px 0 13px}
+  .rd-kpis div{background:#fff;padding:7px 9px}
+  .rd-kpis b{font-size:15pt}
+  .rd-branch,.rd-table tr{page-break-inside:avoid}
+  .rd-branch{margin-bottom:9px}
+  .rd-branch-head{padding-bottom:3px}
+  .report-doc h1{font-size:17pt;margin-top:12px}
+  .rd-period{font-size:8.6pt}
+  .rd-table th,.rd-table td{font-size:8.2pt;padding:3px 5px}
+  .rd-note{padding-top:8px;margin-top:5px}
+  .rd-note h3{font-size:10pt}
+  .rd-note p{font-size:8.8pt;line-height:1.55}
+  .rd-todo{font-size:8.4pt;padding:5px 8px;margin-top:6px}
+  .rd-foot{margin-top:10px;padding-top:7px;font-size:7.6pt;break-inside:avoid;page-break-inside:avoid;flex-direction:row;justify-content:space-between}
+  .spark{width:60px;height:16px}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar no-print">
+    <div class="topbar-inner">
+      <a class="brand" href="#dashboard" data-act="go-dashboard" aria-label="그로스코리아 플레이스 순위 대시보드 홈">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V9"/><path d="M10 18V5"/><path d="M16 18v-6"/><path d="M21 18H3"/></svg>
+        </span>
+        <span class="brand-text"><strong>그로스코리아</strong><span>GROWTH KOREA</span></span>
+      </a>
+
+      <nav class="tabs" role="tablist" aria-label="화면 전환">
+        <button class="tab on" role="tab" aria-selected="true" data-act="page" data-page="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l3-4 3 2 4-6"/></svg>
+          대시보드
+        </button>
+        <button class="tab" role="tab" aria-selected="false" data-act="page" data-page="manage">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V6l7-3 7 3v15"/><path d="M4 21h16"/><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"/></svg>
+          지점·키워드
+        </button>
+        <button class="tab" role="tab" aria-selected="false" data-act="page" data-page="report">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h4"/></svg>
+          리포트
+        </button>
+      </nav>
+
+      <div class="top-actions">
+        <span class="data-pill" id="dataPill" title="데이터 저장 상태"><i class="dot"></i><span id="dataPillText">불러오는 중</span></span>
+        <button class="btn primary sm" data-act="quick-input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span class="hide-sm">오늘 순위 입력</span><span class="show-sm">순위 입력</span>
+        </button>
+        <button class="icon-btn" data-act="import-json" title="데이터 가져오기" aria-label="데이터 가져오기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5"/><path d="M8 9l4-4 4 4"/><path d="M4 19h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- ================================================== 대시보드 ========== -->
+    <section class="page" id="page-dashboard" aria-label="플레이스 순위 대시보드">
+      <div class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow"><i class="dot"></i>NAVER PLACE RANK MONITOR</span>
+          <h1>지점별 플레이스 순위</h1>
+          <p id="heroSub">룸의정석·와그자그·논다노래타운 지점의 키워드 순위를 매일 기록합니다.</p>
+        </div>
+        <div class="daynav" role="group" aria-label="기준일 선택">
+          <button class="icon-btn" id="dayPrev" data-act="day-prev" aria-label="이전 날짜">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <div class="daynav-label"><b id="dayLabel">–</b><span id="dayState">–</span></div>
+          <button class="icon-btn" id="dayNext" data-act="day-next" aria-label="다음 날짜">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <div class="card filter-card">
+        <div class="filter-row">
+          <div class="chips" id="brandChips" role="group" aria-label="브랜드 필터"></div>
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+            <input id="searchInput" type="search" placeholder="지점·키워드 검색" autocomplete="off" aria-label="지점·키워드 검색">
+          </label>
+          <label class="select">
+            <span class="sr-only">지점 선택</span>
+            <select id="branchSelect"></select>
+          </label>
+          <label class="select">
+            <span class="sr-only">정렬 기준</span>
+            <select id="sortSelect">
+              <option value="default">지점 순</option>
+              <option value="rank">순위 높은 순</option>
+              <option value="move">상승 폭 순</option>
+            </select>
+          </label>
+        </div>
+        <div class="filter-meta">
+          <span id="filterSummary"></span>
+          <button class="btn-link" data-act="reset-filter">필터 초기화</button>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card chart-card" id="chartCard">
+          <div class="card-head chart-head">
+            <div>
+              <h2>일자별 순위 추이</h2>
+              <p id="chartScope">전체 키워드</p>
+            </div>
+            <div class="seg" id="rangeSeg" role="group" aria-label="기간 선택">
+              <button data-act="range" data-id="7">7일</button>
+              <button data-act="range" data-id="14" class="on">14일</button>
+            </div>
+          </div>
+          <div class="legend-row" id="chartLegend"></div>
+          <div class="chart-wrap" id="chartWrap"></div>
+          <p class="chart-note" id="chartNote"></p>
+        </div>
+        <aside class="card insight" id="insightCard" aria-label="오늘 체크 포인트"></aside>
+      </div>
+
+      <div class="card table-card">
+        <div class="card-head">
+          <div>
+            <h2>지점별 · 키워드별 순위 <span class="count" id="tableCount"></span></h2>
+            <p>키워드를 누르면 위 차트가 그 키워드로 바뀝니다. 순위 배지를 누르면 오늘 순위를 바로 고칠 수 있습니다.</p>
+          </div>
+          <div class="head-actions">
+            <button class="btn sm ghost" data-act="quick-input">오늘 순위 입력</button>
+            <button class="btn sm ghost" data-act="export-csv">CSV</button>
+            <button class="btn sm dark" data-act="report">리포트</button>
+          </div>
+        </div>
+        <div id="tableHost" class="only-desktop"></div>
+        <div id="cardHost" class="only-mobile"></div>
+      </div>
+
+      <p class="foot-note no-print">
+        기록은 이 브라우저(localStorage)에 저장됩니다. 매일 자동 수집 스크립트가 만든 JSON을
+        <button class="btn-link" data-act="import-json">가져오기</button>로 바로 붙일 수 있습니다.
+        <span id="footStamp"></span>
+      </p>
+    </section>
+
+    <!-- ============================================ 지점·키워드 관리 ========= -->
+    <section class="page hidden" id="page-manage" aria-label="지점 및 키워드 관리">
+      <div id="manageHost"></div>
+    </section>
+
+    <!-- ==================================================== 리포트 ========== -->
+    <section class="page hidden" id="page-report" aria-label="클라이언트 리포트">
+      <div class="page-head report-controls no-print">
+        <div>
+          <span class="eyebrow">CLIENT REPORT</span>
+          <h1>리포트 · 카톡 요약</h1>
+          <p>클라이언트에게 그대로 보낼 수 있는 보고서를 만들고 인쇄하거나 PDF로 저장합니다.</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn ghost" data-act="copy-kakao">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 5H6a1 1 0 00-1 1v9"/></svg>
+            카톡 요약 복사
+          </button>
+          <button class="btn ghost" data-act="kakao-preview">문구 미리보기</button>
+          <button class="btn primary" data-act="print">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="7" rx="2"/><path d="M7 16h10v4H7z"/></svg>
+            인쇄 / PDF 저장
+          </button>
+        </div>
+      </div>
+
+      <div class="card report-form no-print">
+        <div class="form-grid">
+          <label>브랜드<select id="rBrand"></select></label>
+          <label>지점<select id="rBranch"></select></label>
+          <label class="grow">보고서 제목<input id="rTitle" type="text" placeholder="예: 룸의정석 주간 순위 보고"></label>
+          <label>기준일<input id="rDate" type="date"></label>
+        </div>
+        <div class="form-hint">제목을 비우면 “브랜드명 + 플레이스 순위 보고”로 자동 생성됩니다. 인쇄 시 A4 1~2장으로 맞춰집니다.</div>
+      </div>
+
+      <div id="reportDoc"></div>
+    </section>
+
+  </main>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================================
+   그로스코리아 (GROWTH KOREA) — 지점별 네이버 플레이스 순위 대시보드
+   data.js : 브랜드 / 지점 / 키워드 / 최근 14일 샘플 추이
+   -------------------------------------------------------------------------
+   - 실제 매장 정보(와그자그 교동점 플레이스 ID)만 실제 값이고,
+     나머지 지점·키워드·순위는 화면 확인용 샘플입니다.
+   - 오늘 날짜를 기준으로 최근 14일을 다시 만들어 넣습니다.
+   - 운영 시에는 이 파일 대신 JSON 가져오기로 실제 수집 데이터를 넣습니다.
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  var BRANDS = [
+    { id: 'room',   name: '룸의정석',     color: '#7a2ff2', soft: '#f2ecff', ink: '#5a1fbe' },
+    { id: 'wagzag', name: '와그자그',     color: '#0b9b6b', soft: '#e8f8f1', ink: '#07734f' },
+    { id: 'nonda',  name: '논다노래타운', color: '#e2557b', soft: '#fdeef3', ink: '#b62a52' }
+  ];
+
+  var BRANCHES = [
+    { id: 'b-hongdae', brandId: 'room', name: '룸의정석 홍대점', short: '홍대점',
+      area: '서울 마포구 서교동', address: '서울 마포구 와우산로 21길', placeId: '',
+      memo: '금·토 21~24시 대기 발생' },
+    { id: 'b-gangnam', brandId: 'room', name: '룸의정석 강남점', short: '강남점',
+      area: '서울 강남구 역삼동', address: '서울 강남구 강남대로94길', placeId: '',
+      memo: '주말 예약 마감 잦음' },
+    { id: 'b-moran', brandId: 'room', name: '룸의정석 모란점', short: '모란점',
+      area: '성남시 중원구 성남동', address: '경기 성남시 중원구 성남대로', placeId: '',
+      memo: '모란역 1번 출구 도보 3분' },
+    { id: 'b-wagzag', brandId: 'wagzag', name: '와그자그 교동점', short: '교동점',
+      area: '대구 중구 교동', address: '대구 중구 경상감영길 181 2층', placeId: '1085497413',
+      memo: '17:00~02:00 · 단체 2~30인' },
+    { id: 'b-nonda-ds', brandId: 'nonda', name: '논다노래타운 동성로점', short: '동성로점',
+      area: '대구 중구 동성로', address: '대구 중구 동성로2가', placeId: '',
+      memo: '' },
+    { id: 'b-nonda-sm', brandId: 'nonda', name: '논다노래타운 서면점', short: '서면점',
+      area: '부산 부산진구 부전동', address: '부산 부산진구 서면로', placeId: '',
+      memo: '' }
+  ];
+
+  /* shape : 14일 전 → 오늘 순위. null = 100위 밖(권외) */
+  var KEYWORDS = [
+    { id: 'k-hd-1', branchId: 'b-hongdae', text: '홍대 헌팅포차', target: 3, priority: 'main',
+      shape: [9, 8, 8, 7, 7, 6, 6, 6, 5, 5, 6, 5, 6, 4], todayStatus: 'manual' },
+    { id: 'k-hd-2', branchId: 'b-hongdae', text: '홍대 헌팅술집', target: 5, priority: 'main',
+      shape: [12, 11, 11, 10, 9, 9, 8, 8, 9, 7, 7, 6, 8, 7] },
+    { id: 'k-hd-3', branchId: 'b-hongdae', text: '홍대 술집', target: 10, priority: 'sub',
+      shape: [18, 17, 16, 16, 15, 14, 15, 13, 13, 12, 11, 12, 11, 11] },
+    { id: 'k-gn-1', branchId: 'b-gangnam', text: '강남 헌팅포차', target: 5, priority: 'main',
+      shape: [7, 6, 6, 5, 5, 4, 4, 3, 4, 3, 2, 2, 2, 3] },
+    { id: 'k-gn-2', branchId: 'b-gangnam', text: '강남역 술집', target: 10, priority: 'sub',
+      shape: [22, 21, 20, 19, 18, 18, 17, 16, 15, 15, 14, 13, 13, 12] },
+    { id: 'k-mr-1', branchId: 'b-moran', text: '모란 헌팅포차', target: 5, priority: 'main',
+      shape: [11, 10, 10, 9, 9, 8, 7, 8, 7, 6, 6, 5, 6, 5] },
+    { id: 'k-mr-2', branchId: 'b-moran', text: '모란역 술집', target: 10, priority: 'sub',
+      shape: [16, 15, 14, 14, 13, 12, 12, 11, 11, 10, 10, 9, 9, 9] },
+    { id: 'k-wg-1', branchId: 'b-wagzag', text: '대구 교동 술집', target: 20, priority: 'main',
+      shape: [34, 33, 32, 31, 30, 29, 28, 29, 30, 31, 32, 33, 32, 31] },
+    { id: 'k-wg-2', branchId: 'b-wagzag', text: '동성로 술집', target: 20, priority: 'sub',
+      shape: [null, null, null, 96, 88, 79, 70, 62, 54, 47, 41, 35, 29, 24] },
+    { id: 'k-nd-1', branchId: 'b-nonda-ds', text: '대구 동성로 노래방', target: 10, priority: 'main',
+      shape: [14, 13, 13, 12, 12, 11, 11, 10, 10, 9, 9, 8, 8, 7] },
+    { id: 'k-nd-2', branchId: 'b-nonda-sm', text: '부산 서면 노래방', target: 10, priority: 'sub',
+      shape: [25, 24, 24, 23, 22, 22, 21, 20, 20, 19, 18, 18, 17, 17], pendingToday: true }
+  ];
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function isoOf(d) {
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function daysEnding(endISO, n) {
+    var p = endISO.split('-').map(Number);
+    var out = [];
+    for (var i = n - 1; i >= 0; i--) {
+      var d = new Date(p[0], p[1] - 1, p[2], 12, 0, 0);
+      d.setDate(d.getDate() - i);
+      out.push(isoOf(d));
+    }
+    return out;
+  }
+
+  function buildSeed() {
+    var today = isoOf(new Date());
+    var dates = daysEnding(today, 14);
+    var keywords = KEYWORDS.map(function (k) {
+      var records = {};
+      k.shape.forEach(function (rank, i) {
+        var last = i === k.shape.length - 1;
+        if (last && k.pendingToday) return;              // 오늘 미확인
+        var status = last ? (k.todayStatus || 'auto') : 'auto';
+        records[dates[i]] = {
+          rank: rank === null ? null : rank,
+          status: status,
+          at: last ? (status === 'manual' ? '09:12' : '09:05') : '09:05'
+        };
+      });
+      return {
+        id: k.id,
+        branchId: k.branchId,
+        text: k.text,
+        target: k.target,
+        priority: k.priority || 'sub',
+        active: true,
+        records: records
+      };
+    });
+
+    return {
+      version: 1,
+      kind: 'place-rank-dashboard',
+      createdAt: new Date().toISOString(),
+      settings: { targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: true },
+      brands: BRANDS.map(function (b) { return Object.assign({}, b); }),
+      branches: BRANCHES.map(function (b) { return Object.assign({}, b); }),
+      keywords: keywords
+    };
+  }
+
+  window.SEED = {
+    build: buildSeed,
+    brands: BRANDS,
+    brandsById: BRANDS.reduce(function (m, b) { m[b.id] = b; return m; }, {})
+  };
+})();
+
+</script>
+<script>
+/* =========================================================================
+   store.js — 상태 저장(localStorage) · 집계 · 가져오기/내보내기
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  var KEY = 'gk.placeRank.v1';
+  var state = null;
+
+  /* ---------------------------------------------------------------- date ---- */
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function isoOf(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function today() { return isoOf(new Date()); }
+  function addDays(iso, n) {
+    var p = iso.split('-').map(Number);
+    var d = new Date(p[0], p[1] - 1, p[2], 12, 0, 0);
+    d.setDate(d.getDate() + n);
+    return isoOf(d);
+  }
+  function daysEnding(end, n) {
+    var out = [];
+    for (var i = n - 1; i >= 0; i--) out.push(addDays(end, -i));
+    return out;
+  }
+  var WEEK = ['일', '월', '화', '수', '목', '금', '토'];
+  function weekday(iso) {
+    var p = iso.split('-').map(Number);
+    return WEEK[new Date(p[0], p[1] - 1, p[2], 12).getDay()];
+  }
+  function fmtDate(iso) {
+    var p = iso.split('-').map(Number);
+    return p[1] + '월 ' + p[2] + '일 (' + weekday(iso) + ')';
+  }
+  function fmtShort(iso) {
+    var p = iso.split('-').map(Number);
+    return p[1] + '/' + p[2];
+  }
+  function fmtFull(iso) {
+    var p = iso.split('-').map(Number);
+    return p[0] + '.' + pad(p[1]) + '.' + pad(p[2]);
+  }
+  function nowHM() {
+    var d = new Date();
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  /* ---------------------------------------------------------------- state --- */
+  function seed() {
+    var s = window.SEED.build();
+    return s;
+  }
+  function normalize(s) {
+    if (!s || !s.branches || !s.keywords) return seed();
+    s.brands = s.brands && s.brands.length ? s.brands : window.SEED.brands;
+    s.settings = Object.assign({ targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false }, s.settings || {});
+    s.keywords.forEach(function (k) {
+      k.records = k.records || {};
+      k.target = Number(k.target) || 10;
+      if (k.active === undefined) k.active = true;
+    });
+    return s;
+  }
+  function load() {
+    if (state) return state;
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) state = normalize(JSON.parse(raw));
+    } catch (e) { console.warn('저장된 데이터를 읽지 못했습니다.', e); }
+    if (!state) { state = seed(); save(); }
+    return state;
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { console.warn('저장하지 못했습니다.', e); }
+  }
+  function reset(keepDemo) {
+    state = keepDemo ? normalize(JSON.parse(JSON.stringify(window.SEED.build()))) : blank();
+    save();
+    return state;
+  }
+  function blank() {
+    return normalize({
+      version: 1, kind: 'place-rank-dashboard',
+      settings: { targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false },
+      brands: window.SEED.brands, branches: [], keywords: []
+    });
+  }
+  function get() { return load(); }
+
+  /* ------------------------------------------------------------- lookups ---- */
+  function brandOf(branchId) {
+    var b = load().branches.filter(function (x) { return x.id === branchId; })[0];
+    if (!b) return { id: '', name: '미지정', color: '#8a93a7', soft: '#f1f3f9', ink: '#5b667e' };
+    return load().brands.filter(function (x) { return x.id === b.brandId; })[0] || { id: b.brandId, name: b.brandId, color: '#8a93a7', soft: '#f1f3f9', ink: '#5b667e' };
+  }
+  function branchOf(id) { return load().branches.filter(function (b) { return b.id === id; })[0] || null; }
+  function brandById(id) {
+    return load().brands.filter(function (b) { return b.id === id; })[0] || { id: id || '', name: '미지정', color: '#8a93a7', soft: '#f1f3f9', ink: '#5b667e' };
+  }
+  function keywordOf(id) { return load().keywords.filter(function (k) { return k.id === id; })[0] || null; }
+  function keywordsOf(branchId) { return load().keywords.filter(function (k) { return k.branchId === branchId; }); }
+
+  /* ------------------------------------------------------------- records ---- */
+  function record(kw, date) { return (kw && kw.records && kw.records[date]) || null; }
+  function rankOn(kw, date) {
+    var r = record(kw, date);
+    return r && typeof r.rank === 'number' ? r.rank : null;
+  }
+  function statusOn(kw, date) {
+    var r = record(kw, date);
+    if (!r) return 'none';                 // 미확인
+    if (r.rank === null) return 'out';     // 권외
+    return r.status === 'manual' ? 'manual' : 'auto';
+  }
+  function prevInfo(kw, date, span) {
+    span = span || 7;
+    var d = date;
+    for (var i = 0; i < span; i++) {
+      d = addDays(d, -1);
+      var r = record(kw, d);
+      if (r && typeof r.rank === 'number') return { rank: r.rank, date: d };
+    }
+    return null;
+  }
+  function deltaOf(kw, date) {
+    var todayRank = rankOn(kw, date);
+    if (todayRank === null) return { diff: null, prev: null, prevDate: null, exact: false };
+    var p = prevInfo(kw, date, 1);
+    if (!p) return { diff: null, prev: null, prevDate: null, exact: false };
+    return { diff: p.rank - todayRank, prev: p.rank, prevDate: p.date, exact: true };
+  }
+  function bestWorst(kw, date, n) {
+    var dates = daysEnding(date, n || 7);
+    var vals = dates.map(function (d) { return rankOn(kw, d); })
+      .filter(function (v) { return typeof v === 'number'; });
+    if (!vals.length) return { best: null, worst: null, count: 0 };
+    return { best: Math.min.apply(null, vals), worst: Math.max.apply(null, vals), count: vals.length };
+  }
+  function seriesOf(kw, date, n) {
+    return daysEnding(date, n || 14).map(function (d) {
+      var r = record(kw, d);
+      return { date: d, rank: r && typeof r.rank === 'number' ? r.rank : null };
+    });
+  }
+
+  /* ------------------------------------------------------------- filters ---- */
+  function filterKeywords(opts) {
+    opts = opts || {};
+    var list = load().keywords.slice();
+    if (opts.brand && opts.brand !== 'all') {
+      var ids = load().branches.filter(function (b) { return b.brandId === opts.brand; }).map(function (b) { return b.id; });
+      list = list.filter(function (k) { return ids.indexOf(k.branchId) >= 0; });
+    }
+    if (opts.branch && opts.branch !== 'all') list = list.filter(function (k) { return k.branchId === opts.branch; });
+    if (opts.q) {
+      var q = String(opts.q).toLowerCase().replace(/\s+/g, ' ').trim();
+      list = list.filter(function (k) {
+        var b = branchOf(k.branchId);
+        var hay = (k.text + ' ' + (b ? b.name + ' ' + b.area : '')).toLowerCase().replace(/\s+/g, ' ');
+        return hay.indexOf(q) >= 0;
+      });
+    }
+    if (!opts.includeInactive) list = list.filter(function (k) { return k.active !== false; });
+    return list;
+  }
+
+  function rowOf(kw, date) {
+    var rank = rankOn(kw, date);
+    var st = statusOn(kw, date);
+    var bw = bestWorst(kw, date, 7);
+    var d = deltaOf(kw, date);
+    var ach = 'na';
+    if (rank !== null) {
+      if (rank <= kw.target) ach = 'met';
+      else if (rank <= kw.target + 3) ach = 'near';
+      else ach = 'miss';
+    }
+    return {
+      kw: kw,
+      branch: branchOf(kw.branchId),
+      brand: brandOf(kw.branchId),
+      rank: rank, status: st, target: kw.target,
+      delta: d.diff, prev: d.prev, prevDate: d.prevDate,
+      best: bw.best, worst: bw.worst, measured: bw.count,
+      achievement: ach,
+      spark: seriesOf(kw, date, 7)
+    };
+  }
+
+  function metrics(date, list) {
+    list = list || load().keywords;
+    var rows = list.map(function (k) { return rowOf(k, date); });
+    var measured = rows.filter(function (r) { return r.rank !== null; });
+    var avg = measured.length ? measured.reduce(function (s, r) { return s + r.rank; }, 0) / measured.length : null;
+    var pair = rows.filter(function (r) { return r.rank !== null && r.prev !== null; });
+    var prevAvg = pair.length ? pair.reduce(function (s, r) { return s + r.prev; }, 0) / pair.length : null;
+    var top5 = measured.filter(function (r) { return r.rank <= (load().settings.targetTop || 5); }).length;
+    var up = rows.filter(function (r) { return r.delta !== null && r.delta > 0; }).length;
+    var down = rows.filter(function (r) { return r.delta !== null && r.delta < 0; }).length;
+    var flat = rows.filter(function (r) { return r.delta === 0; }).length;
+    var met = rows.filter(function (r) { return r.achievement === 'met'; }).length;
+    var near = rows.filter(function (r) { return r.achievement === 'near'; }).length;
+    var pending = rows.filter(function (r) { return r.status === 'none'; }).length;
+    var branchIds = [];
+    list.forEach(function (k) { if (branchIds.indexOf(k.branchId) < 0) branchIds.push(k.branchId); });
+    return {
+      rows: rows, count: rows.length, measured: measured.length,
+      branches: branchIds.length, avg: avg, prevAvg: prevAvg,
+      avgDiff: (avg !== null && prevAvg !== null) ? prevAvg - avg : null,
+      top5: top5, top5Rate: measured.length ? Math.round(top5 / measured.length * 100) : 0,
+      up: up, down: down, flat: flat, met: met, near: near, pending: pending
+    };
+  }
+
+  /* ------------------------------------------------------------ mutations --- */
+  function uid(prefix) {
+    return (prefix || 'id') + '-' + Date.now().toString(36).slice(-5) + Math.floor(Math.random() * 900 + 100);
+  }
+  function addBranch(data) {
+    var s = load();
+    var name = String(data.name || '').trim();
+    if (!name) throw new Error('지점명을 입력해 주세요.');
+    if (s.branches.some(function (b) { return b.name === name; })) throw new Error('같은 이름의 지점이 이미 있습니다.');
+    var b = {
+      id: uid('b'), brandId: data.brandId || s.brands[0].id, name: name,
+      short: String(data.short || '').trim() || name.replace(/\s+/g, ' ').split(' ').pop(),
+      area: String(data.area || '').trim(), address: String(data.address || '').trim(),
+      placeId: String(data.placeId || '').trim(), memo: String(data.memo || '').trim()
+    };
+    s.branches.push(b); save(); return b;
+  }
+  function updateBranch(id, data) {
+    var s = load();
+    var b = branchOf(id); if (!b) throw new Error('지점을 찾을 수 없습니다.');
+    var name = String(data.name || '').trim();
+    if (!name) throw new Error('지점명을 입력해 주세요.');
+    if (s.branches.some(function (x) { return x.name === name && x.id !== id; })) throw new Error('같은 이름의 지점이 이미 있습니다.');
+    b.brandId = data.brandId || b.brandId;
+    b.name = name;
+    b.short = String(data.short || '').trim() || b.short;
+    b.area = String(data.area || '').trim();
+    b.address = String(data.address || '').trim();
+    b.placeId = String(data.placeId || '').trim();
+    b.memo = String(data.memo || '').trim();
+    save(); return b;
+  }
+  function deleteBranch(id) {
+    var s = load();
+    s.branches = s.branches.filter(function (b) { return b.id !== id; });
+    s.keywords = s.keywords.filter(function (k) { return k.branchId !== id; });
+    save();
+  }
+  function addKeyword(data) {
+    var s = load();
+    var text = String(data.text || '').trim().replace(/\s+/g, ' ');
+    if (!text) throw new Error('키워드를 입력해 주세요.');
+    if (!branchOf(data.branchId)) throw new Error('지점을 선택해 주세요.');
+    if (s.keywords.some(function (k) { return k.branchId === data.branchId && k.text === text; })) {
+      throw new Error('이 지점에 같은 키워드가 이미 있습니다.');
+    }
+    var k = {
+      id: uid('k'), branchId: data.branchId, text: text,
+      target: Math.max(1, Number(data.target) || load().settings.targetTop || 5),
+      priority: data.priority === 'main' ? 'main' : 'sub',
+      active: data.active === undefined ? true : !!data.active,
+      records: {}
+    };
+    s.keywords.push(k); save(); return k;
+  }
+  function updateKeyword(id, data) {
+    var s = load();
+    var k = keywordOf(id); if (!k) throw new Error('키워드를 찾을 수 없습니다.');
+    var text = String(data.text || '').trim().replace(/\s+/g, ' ');
+    if (!text) throw new Error('키워드를 입력해 주세요.');
+    if (s.keywords.some(function (x) { return x.branchId === (data.branchId || k.branchId) && x.text === text && x.id !== id; })) {
+      throw new Error('이 지점에 같은 키워드가 이미 있습니다.');
+    }
+    k.text = text;
+    if (data.branchId) k.branchId = data.branchId;
+    k.target = Math.max(1, Number(data.target) || k.target);
+    k.priority = data.priority === 'main' ? 'main' : 'sub';
+    if (data.active !== undefined) k.active = !!data.active;
+    save(); return k;
+  }
+  function deleteKeyword(id) {
+    var s = load();
+    s.keywords = s.keywords.filter(function (k) { return k.id !== id; });
+    save();
+  }
+  function setRank(id, date, rank, status) {
+    var k = keywordOf(id); if (!k) throw new Error('키워드를 찾을 수 없습니다.');
+    k.records = k.records || {};
+    k.records[date] = {
+      rank: (rank === null || rank === '' || isNaN(rank)) ? null : Math.max(1, Math.round(Number(rank))),
+      status: status || 'manual',
+      at: nowHM()
+    };
+    save();
+    return k.records[date];
+  }
+  function clearRank(id, date) {
+    var k = keywordOf(id); if (!k) return;
+    if (k.records) delete k.records[date];
+    save();
+  }
+
+  /* ------------------------------------------------------------- export ----- */
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function dateRange() {
+    var s = load();
+    var all = [];
+    s.keywords.forEach(function (k) {
+      Object.keys(k.records || {}).forEach(function (d) { if (all.indexOf(d) < 0) all.push(d); });
+    });
+    all.sort();
+    var end = all.length ? all[all.length - 1] : today();
+    if (end < today()) end = today();
+    return daysEnding(end, 14);
+  }
+  function exportJSON() {
+    var s = load();
+    return JSON.stringify({
+      kind: 'place-rank-dashboard',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      settings: s.settings,
+      brands: s.brands,
+      branches: s.branches,
+      keywords: s.keywords
+    }, null, 2);
+  }
+  function csvCell(v) {
+    var str = v === null || v === undefined ? '' : String(v);
+    return /[",\n]/.test(str) ? '"' + str.replace(/"/g, '""') + '"' : str;
+  }
+  function rankText(r) {
+    if (!r) return '';
+    if (r.rank === null) return '권외';
+    return String(r.rank);
+  }
+  function exportCSV(mode, list) {
+    var s = load();
+    var dates = dateRange();
+    var kws = list || s.keywords;
+    var lines = [];
+    if (mode === 'long') {
+      lines.push(['브랜드', '지점', '키워드', '날짜', '순위', '상태', '확인시각'].join(','));
+      kws.forEach(function (k) {
+        var b = branchOf(k.branchId); var brand = brandOf(k.branchId);
+        dates.forEach(function (d) {
+          var r = record(k, d);
+          if (!r) return;
+          lines.push([brand.name, b ? b.name : '', k.text, d, rankText(r),
+            r.status === 'manual' ? '수동확인' : '자동수집', r.at || ''].map(csvCell).join(','));
+        });
+      });
+    } else {
+      var head = ['브랜드', '지점', '지역', '키워드', '목표순위', '우선순위'].concat(dates).concat(['오늘상태', '확인시각']);
+      lines.push(head.map(csvCell).join(','));
+      kws.forEach(function (k) {
+        var b = branchOf(k.branchId); var brand = brandOf(k.branchId);
+        var last = k.records[dates[dates.length - 1]] || null;
+        var row = [brand.name, b ? b.name : '', b ? b.area : '', k.text, k.target, k.priority === 'main' ? '메인' : '서브'];
+        dates.forEach(function (d) { row.push(rankText(record(k, d))); });
+        row.push(last ? (last.status === 'manual' ? '수동확인' : '자동수집') : '미확인');
+        row.push(last ? (last.at || '') : '');
+        lines.push(row.map(csvCell).join(','));
+      });
+    }
+    return '\ufeff' + lines.join('\r\n');
+  }
+
+  /* ------------------------------------------------------------- import ----- */
+  function parseCSV(text) {
+    text = String(text || '').replace(/^\ufeff/, '');
+    var rows = [], row = [], cell = '', q = false;
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (q) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { cell += '"'; i++; } else q = false;
+        } else cell += c;
+      } else if (c === '"') q = true;
+      else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+      else if (c === '\r') { /* skip */ }
+      else cell += c;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    return rows.filter(function (r) { return r.some(function (x) { return String(x).trim() !== ''; }); });
+  }
+
+  function toRank(v) {
+    if (v === null || v === undefined) return undefined;
+    var s = String(v).trim();
+    if (!s) return undefined;
+    if (/^(권외|out|OUT|>?\s*100\s*\+?|100위\s*밖)$/.test(s)) return null;
+    var n = Number(s.replace(/[^0-9.]/g, ''));
+    if (!isFinite(n) || n <= 0) return undefined;
+    return Math.round(n);
+  }
+
+  function findBranchByName(name) {
+    var s = load();
+    var key = String(name || '').replace(/\s+/g, ' ').trim();
+    if (!key) return null;
+    return s.branches.filter(function (b) { return b.name === key || b.short === key; })[0] || null;
+  }
+
+  function importData(text, opts) {
+    opts = opts || {};
+    var s = load();
+    var report = { mode: 'records', addedKeywords: 0, addedBranches: 0, updated: 0, skipped: 0, removed: 0, errors: [], dates: [] };
+    var raw = String(text || '').trim();
+    if (!raw) throw new Error('가져올 내용이 비어 있습니다.');
+
+    var obj = null;
+    if (raw[0] === '{' || raw[0] === '[') {
+      try { obj = JSON.parse(raw); } catch (e) { throw new Error('JSON 형식이 올바르지 않습니다. (' + e.message + ')'); }
+    }
+
+    /* ---------- 1) 전체 백업 복원 ---------- */
+    if (obj && !Array.isArray(obj) && (obj.kind === 'place-rank-dashboard' || (obj.branches && obj.keywords))) {
+      if (!obj.branches || !obj.keywords) throw new Error('백업 파일에 branches / keywords 가 없습니다.');
+      var next = normalize(JSON.parse(JSON.stringify(obj)));
+      next.settings.demo = false;
+      state = next; save();
+      report.mode = 'restore';
+      report.addedBranches = next.branches.length;
+      report.addedKeywords = next.keywords.length;
+      return report;
+    }
+
+    /* ---------- 2) 순위 기록(JSON) ---------- */
+    if (obj) {
+      var items = Array.isArray(obj) ? obj : (obj.items || obj.results || obj.rows || []);
+      if (!items.length) throw new Error('items 배열에 순위 기록이 없습니다.');
+      var fallbackDate = (obj && !Array.isArray(obj) && obj.date) ? String(obj.date).slice(0, 10) : today();
+      items.forEach(function (it) {
+        try {
+          var branchName = it.branch || it.branchName || it.store || it.storeName || '';
+          var kwText = String(it.keyword || it.text || it.query || '').replace(/\s+/g, ' ').trim();
+          var date = String(it.date || fallbackDate).slice(0, 10);
+          var rank = toRank(it.rank !== undefined ? it.rank : it.position);
+          if (!kwText) { report.skipped++; return; }
+          if (rank === undefined) { report.skipped++; return; }
+          var branch = findBranchByName(branchName);
+          if (!branch) {
+            if (!opts.autoAdd) { report.skipped++; report.errors.push('지점 없음: ' + branchName + ' / ' + kwText); return; }
+            var brandName = it.brand || it.brandName || '';
+            var brand = s.brands.filter(function (b) { return b.name === brandName || b.id === brandName; })[0] || s.brands[0];
+            branch = addBranch({ name: branchName || (brand.name + ' ' + (it.short || '신규점')), brandId: brand.id, area: it.area || '' });
+            report.addedBranches++;
+          }
+          var kw = s.keywords.filter(function (k) { return k.branchId === branch.id && k.text === kwText; })[0];
+          if (!kw) {
+            if (!opts.autoAdd) { report.skipped++; report.errors.push('키워드 없음: ' + branch.name + ' / ' + kwText); return; }
+            kw = addKeyword({ branchId: branch.id, text: kwText, target: it.target || 10, priority: it.priority === 'main' ? 'main' : 'sub' });
+            report.addedKeywords++;
+          }
+          if (it.target) kw.target = Math.max(1, Number(it.target) || kw.target);
+          var prev = record(kw, date);
+          kw.records[date] = {
+            rank: rank,
+            status: it.status === 'manual' || it.status === '수동확인' ? 'manual' : 'auto',
+            at: String(it.at || it.checkedAt || '').slice(0, 5) || nowHM()
+          };
+          if (prev) report.removed++;
+          report.updated++;
+          if (report.dates.indexOf(date) < 0) report.dates.push(date);
+        } catch (e) {
+          report.skipped++;
+          report.errors.push(e.message);
+        }
+      });
+      if (report.updated || report.addedKeywords) s.settings.demo = false;
+      save();
+      return report;
+    }
+
+    /* ---------- 3) CSV ---------- */
+    var rows = parseCSV(raw);
+    if (rows.length < 2) throw new Error('CSV에 데이터 행이 없습니다.');
+    var head = rows[0].map(function (h) { return String(h).trim(); });
+    var isLong = head.indexOf('날짜') >= 0;
+    var idx = function (name) { return head.indexOf(name); };
+    var cBrand = idx('브랜드'), cBranch = idx('지점'), cKw = idx('키워드');
+    var cDate = idx('날짜'), cRank = idx('순위'), cStatus = idx('상태'), cAt = idx('확인시각');
+    var cTarget = idx('목표순위'), cArea = idx('지역'), cPriority = idx('우선순위');
+    var dateCols = head.map(function (h, i) { return /^\d{4}-\d{2}-\d{2}$/.test(h) ? i : -1; }).filter(function (i) { return i >= 0; });
+    if (cBranch < 0 || cKw < 0) throw new Error('CSV에 "지점"과 "키워드" 열이 필요합니다.');
+    if (!isLong && !dateCols.length) throw new Error('CSV에 날짜 열(YYYY-MM-DD)이 없습니다.');
+
+    rows.slice(1).forEach(function (r) {
+      try {
+        var branchName = cBranch >= 0 ? r[cBranch] : '';
+        var kwText = String(r[cKw] || '').replace(/\s+/g, ' ').trim();
+        if (!kwText) { report.skipped++; return; }
+        var branch = findBranchByName(branchName);
+        if (!branch) {
+          if (!opts.autoAdd) { report.skipped++; report.errors.push('지점 없음: ' + branchName); return; }
+          var brand = s.brands.filter(function (b) { return b.name === String(r[cBrand] || '').trim(); })[0] || s.brands[0];
+          branch = addBranch({ name: branchName, brandId: brand.id, area: cArea >= 0 ? r[cArea] : '' });
+          report.addedBranches++;
+        }
+        var kw = s.keywords.filter(function (k) { return k.branchId === branch.id && k.text === kwText; })[0];
+        if (!kw) {
+          if (!opts.autoAdd) { report.skipped++; report.errors.push('키워드 없음: ' + branch.name + ' / ' + kwText); return; }
+          kw = addKeyword({ branchId: branch.id, text: kwText, target: cTarget >= 0 ? Number(r[cTarget]) || 10 : 10 });
+          report.addedKeywords++;
+        }
+        if (cTarget >= 0 && Number(r[cTarget])) kw.target = Number(r[cTarget]);
+        if (cPriority >= 0 && r[cPriority]) kw.priority = String(r[cPriority]).indexOf('메인') >= 0 ? 'main' : 'sub';
+
+        function put(date, val) {
+          var rank = toRank(val);
+          if (rank === undefined) return;
+          kw.records[date] = {
+            rank: rank,
+            status: (cStatus >= 0 && String(r[cStatus]).indexOf('수동') >= 0) ? 'manual' : 'auto',
+            at: cAt >= 0 ? String(r[cAt] || '').slice(0, 5) : nowHM()
+          };
+          report.updated++;
+          if (report.dates.indexOf(date) < 0) report.dates.push(date);
+        }
+        if (isLong) {
+          var d = String(r[cDate] || '').slice(0, 10);
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { report.skipped++; return; }
+          put(d, r[cRank]);
+        } else {
+          dateCols.forEach(function (ci) { put(head[ci], r[ci]); });
+        }
+      } catch (e) {
+        report.skipped++;
+        report.errors.push(e.message);
+      }
+    });
+    save();
+    return report;
+  }
+
+  /* --------------------------------------------------------------- report --- */
+  function kakaoText(opts) {
+    opts = opts || {};
+    var date = opts.date || today();
+    var list = filterKeywords({ brand: opts.brand || 'all', branch: opts.branch || 'all' });
+    var m = metrics(date, list);
+    var brandObj = opts.brand && opts.brand !== 'all'
+      ? load().brands.filter(function (b) { return b.id === opts.brand; })[0] : null;
+    var title = brandObj ? brandObj.name : '전체';
+    var out = [];
+    out.push('[' + title + ' 플레이스 순위 보고]');
+    out.push(fmtFull(date) + ' (' + weekday(date) + ') 기준');
+    out.push('');
+
+    var byBranch = [];
+    m.rows.forEach(function (r) {
+      var id = r.branch ? r.branch.id : '';
+      var found = byBranch.filter(function (x) { return x.id === id; })[0];
+      if (!found) { found = { id: id, name: r.branch ? r.branch.name : '지점 미지정', rows: [] }; byBranch.push(found); }
+      found.rows.push(r);
+    });
+    byBranch.forEach(function (b) {
+      out.push('▸ ' + b.name);
+      b.rows.forEach(function (r) {
+        var line = '· ' + r.kw.text + ' ' + rankLabel(r);
+        var dl = deltaLabel(r);
+        if (dl) line += ' ' + dl;
+        out.push(line);
+      });
+    });
+
+    out.push('');
+    out.push('합계 ' + m.count + '개 키워드 · 평균 ' + (m.avg === null ? '-' : m.avg.toFixed(1)) + '위');
+    out.push('Top ' + (load().settings.targetTop || 5) + ' ' + m.top5 + '개 · 목표 달성 ' + m.met + '개');
+    out.push('전일 대비 ▲' + m.up + ' ▼' + m.down + (m.flat ? ' · 유지 ' + m.flat : '') + (m.pending ? ' · 미확인 ' + m.pending : ''));
+    out.push('');
+    out.push('- 그로스코리아');
+    return out.join('\n');
+  }
+  function rankLabel(r) {
+    if (r.status === 'none') return '미확인';
+    if (r.rank === null) return '권외';
+    return r.rank + '위';
+  }
+  function deltaLabel(r) {
+    if (r.delta === null) return '';
+    if (r.delta > 0) return '(▲' + r.delta + ')';
+    if (r.delta < 0) return '(▼' + Math.abs(r.delta) + ')';
+    return '(-)';
+  }
+
+  window.Store = {
+    get state() { return load(); },
+    load: load, save: save, reset: reset, blank: blank,
+    today: today, addDays: addDays, daysEnding: daysEnding, fmtDate: fmtDate, fmtShort: fmtShort,
+    fmtFull: fmtFull, weekday: weekday, nowHM: nowHM,
+    brandOf: brandOf, brandById: brandById, branchOf: branchOf, keywordOf: keywordOf, keywordsOf: keywordsOf,
+    record: record, rankOn: rankOn, statusOn: statusOn, deltaOf: deltaOf, bestWorst: bestWorst,
+    seriesOf: seriesOf, filterKeywords: filterKeywords, rowOf: rowOf, metrics: metrics,
+    addBranch: addBranch, updateBranch: updateBranch, deleteBranch: deleteBranch,
+    addKeyword: addKeyword, updateKeyword: updateKeyword, deleteKeyword: deleteKeyword,
+    setRank: setRank, clearRank: clearRank,
+    exportJSON: exportJSON, exportCSV: exportCSV, importData: importData,
+    dateRange: dateRange, kakaoText: kakaoText, rankLabel: rankLabel, deltaLabel: deltaLabel
+  };
+})();
+
+</script>
+<script>
+/* =========================================================================
+   chart.js — SVG 꺾은선 차트 (1위가 위로 가도록 y축 반전)
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  var NS = 'http://www.w3.org/2000/svg';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function niceMax(v) {
+    return Math.max(10, Math.ceil((v || 10) / 5) * 5);
+  }
+  function tickStep(max) {
+    if (max <= 30) return 5;
+    if (max <= 60) return 10;
+    return 20;
+  }
+
+  /**
+   * 차트 렌더
+   * @param {HTMLElement} host  .chart-wrap
+   * @param {Object} opts
+   *   series: [{id,label,color,points:[{date,rank}],dash}]
+   *   height: number
+   *   today: ISO string
+   */
+  function render(host, opts) {
+    var series = (opts.series || []).filter(function (s) { return s.points && s.points.length; });
+    var dates = opts.dates || (series[0] ? series[0].points.map(function (p) { return p.date; }) : []);
+    var W = Math.max(280, host.clientWidth || 600);
+    var H = opts.height || 300;
+    var padL = 40, padR = 16, padT = 30, padB = 30;
+    var plotW = W - padL - padR;
+    var plotH = H - padT - padB;
+    var n = dates.length;
+
+    var maxVal = 0;
+    series.forEach(function (s) {
+      s.points.forEach(function (p) { if (typeof p.rank === 'number' && p.rank > maxVal) maxVal = p.rank; });
+    });
+    var yMax = opts.yMax || niceMax(maxVal || 10);
+    var step = tickStep(yMax);
+
+    function x(i) { return padL + (n <= 1 ? plotW / 2 : (plotW * i) / (n - 1)); }
+    function y(v) { return padT + (plotH * (Math.min(v, yMax) - 1)) / Math.max(1, yMax - 1); }
+
+    var parts = [];
+    parts.push('<svg class="chart" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' +
+      esc(opts.ariaLabel || '최근 순위 추이 차트. 1위가 위쪽입니다.') + '">');
+
+    /* 그리드 + y축 (1, 5, 10 … 처럼 읽기 쉬운 눈금) */
+    var ticks = [1];
+    for (var t = step; t <= yMax; t += step) ticks.push(t);
+    if (ticks[ticks.length - 1] !== yMax) ticks.push(yMax);
+    ticks.forEach(function (v) {
+      var gy = y(v);
+      parts.push('<line class="grid-line" x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + gy.toFixed(1) + '"/>');
+      parts.push('<text class="axis-y" x="' + (padL - 9) + '" y="' + (gy + 3.5).toFixed(1) + '" text-anchor="end">' + v + '</text>');
+    });
+    parts.push('<text class="axis-caption" x="' + (padL - 9) + '" y="' + (padT - 13) + '" text-anchor="end">순위</text>');
+
+    /* x축 (마지막 날짜와 겹치지 않게 간격을 띄운다) */
+    var every = Math.max(1, Math.ceil(n / (W < 520 ? 4 : 7)));
+    var show = [];
+    for (var xi = 0; xi < n; xi += every) show.push(xi);
+    var lastIdx = n - 1;
+    show = show.filter(function (i) {
+      return i === lastIdx || (lastIdx - i) >= Math.max(2, every - 1);
+    });
+    if (show.indexOf(lastIdx) < 0) show.push(lastIdx);
+    show.forEach(function (i) {
+      var label = Store.fmtShort(dates[i]);
+      parts.push('<text class="axis-x' + (i === lastIdx ? ' is-today' : '') + '" x="' + x(i).toFixed(1) + '" y="' + (H - 9) + '" text-anchor="middle">' + esc(label) + '</text>');
+    });
+
+    /* 선 */
+    series.forEach(function (s, si) {
+      var segments = [], cur = [];
+      s.points.forEach(function (p, i) {
+        if (typeof p.rank === 'number') cur.push([x(i), y(p.rank)]);
+        else { if (cur.length) segments.push(cur); cur = []; }
+      });
+      if (cur.length) segments.push(cur);
+
+      segments.forEach(function (seg) {
+        if (seg.length === 1) {
+          parts.push('<circle cx="' + seg[0][0].toFixed(1) + '" cy="' + seg[0][1].toFixed(1) + '" r="3" fill="' + s.color + '"/>');
+          return;
+        }
+        var d = seg.map(function (pt, i2) { return (i2 ? 'L' : 'M') + pt[0].toFixed(1) + ' ' + pt[1].toFixed(1); }).join(' ');
+        parts.push('<path class="series-line" d="' + d + '" fill="none" stroke="' + s.color + '" stroke-width="' +
+          (opts.series.length > 3 ? 1.9 : 2.4) + '" stroke-linecap="round" stroke-linejoin="round"' +
+          (s.dash ? ' stroke-dasharray="5 4"' : '') + '/>');
+      });
+
+      /* 점 */
+      s.points.forEach(function (p, i) {
+        if (typeof p.rank !== 'number') return;
+        var isLast = i === s.points.length - 1 && p.date === opts.today;
+        parts.push('<circle class="dot' + (isLast ? ' is-last' : '') + '" data-series="' + esc(s.id) + '" data-i="' + i + '" cx="' + x(i).toFixed(1) + '" cy="' + y(p.rank).toFixed(1) + '" r="' + (isLast ? 4.6 : 3.1) + '" fill="' + s.color + '"/>');
+      });
+    });
+
+    /* hover 가이드 */
+    parts.push('<g class="hover-layer" style="display:none"><line class="guide" x1="0" y1="' + padT + '" x2="0" y2="' + (H - padB) + '" stroke="#9aa4bd" stroke-width="1" stroke-dasharray="3 3"/></g>');
+    parts.push('<rect class="hit" x="' + padL + '" y="' + padT + '" width="' + plotW + '" height="' + plotH + '" fill="transparent" style="cursor:crosshair"/>');
+    parts.push('</svg>');
+
+    host.innerHTML = '<div class="chart-canvas">' + parts.join('') + '</div><div class="chart-tip" hidden></div>';
+
+    /* 인터랙션 */
+    var svg = host.querySelector('svg');
+    var tip = host.querySelector('.chart-tip');
+    var guide = svg.querySelector('.hover-layer');
+    var guideLine = svg.querySelector('.guide');
+    var hit = svg.querySelector('.hit');
+
+    function idxFromEvent(ev) {
+      var rect = svg.getBoundingClientRect();
+      var px = (ev.clientX - rect.left) * (W / rect.width);
+      var i = Math.round(((px - padL) / plotW) * (n - 1));
+      return Math.max(0, Math.min(n - 1, i));
+    }
+    function show(ev) {
+      var i = idxFromEvent(ev);
+      var gx = x(i);
+      guide.style.display = '';
+      guideLine.setAttribute('x1', gx); guideLine.setAttribute('x2', gx);
+      var rows = series.map(function (s) {
+        var p = s.points[i] || {};
+        return '<div class="tip-row"><span class="dot-s" style="background:' + s.color + '"></span>' +
+          '<span class="tip-label">' + esc(s.label) + '</span><b>' + (typeof p.rank === 'number' ? p.rank + '위' : '—') + '</b></div>';
+      }).join('');
+      tip.innerHTML = '<div class="tip-date">' + esc(Store.fmtDate(dates[i])) + '</div>' + rows;
+      tip.hidden = false;
+      var rect = host.getBoundingClientRect();
+      var px = (gx / W) * rect.width;
+      var left = Math.max(6, Math.min(rect.width - tip.offsetWidth - 6, px - tip.offsetWidth / 2));
+      tip.style.left = left + 'px';
+      tip.style.top = '8px';
+    }
+    hit.addEventListener('pointermove', show);
+    hit.addEventListener('pointerdown', show);
+    hit.addEventListener('pointerleave', function () { tip.hidden = true; guide.style.display = 'none'; });
+  }
+
+  function spark(points, color, w, h) {
+    w = w || 76; h = h || 22;
+    var vals = points.filter(function (p) { return typeof p.rank === 'number'; });
+    if (vals.length < 2) return '<span class="spark-empty">–</span>';
+    var max = Math.max.apply(null, vals.map(function (p) { return p.rank; }));
+    var min = Math.min.apply(null, vals.map(function (p) { return p.rank; }));
+    var span = Math.max(1, max - min);
+    var stepX = w / Math.max(1, points.length - 1);
+    var segs = [], cur = [];
+    points.forEach(function (p, i) {
+      if (typeof p.rank === 'number') {
+        var px = i * stepX;
+        var py = 2 + (h - 4) * ((p.rank - min) / span);
+        cur.push((cur.length ? 'L' : 'M') + px.toFixed(1) + ' ' + py.toFixed(1));
+      } else if (cur.length) { segs.push(cur.join(' ')); cur = []; }
+    });
+    if (cur.length) segs.push(cur.join(' '));
+    var paths = segs.map(function (d) {
+      return '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+    }).join('');
+    var last = vals[vals.length - 1];
+    var lastP = points.slice().reverse().filter(function (p) { return typeof p.rank === 'number'; })[0];
+    var lastI = points.indexOf(lastP);
+    var ly = 2 + (h - 4) * ((last.rank - min) / span);
+    var dot = '<circle cx="' + (lastI * stepX).toFixed(1) + '" cy="' + ly.toFixed(1) + '" r="2" fill="' + color + '"/>';
+    return '<svg class="spark" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true">' + paths + dot + '</svg>';
+  }
+
+  window.Chart = { render: render, spark: spark, esc: esc };
+})();
+
+</script>
+<script>
+/* =========================================================================
+   views.js — 화면 렌더 (대시보드 · 관리 · 리포트)
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  var ICON = {
+    trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10a2.8 2.8 0 10-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></svg>',
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8 8"/><path d="M19 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1h5"/></svg>',
+    search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>',
+    copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M15 5H6a1 1 0 00-1 1v9"/></svg>',
+    print: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="7" rx="2"/><path d="M7 16h10v4H7z"/></svg>',
+    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M4 19h16"/></svg>',
+    upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V9"/><path d="M8 13l4-4 4 4"/><path d="M4 5h16"/></svg>',
+    left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>',
+    right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>',
+    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+    alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.5" r=".6" fill="currentColor"/><circle cx="12" cy="12" r="9"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>',
+    building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V6l7-3 7 3v15"/><path d="M4 21h16"/><path d="M8 9h.01M12 9h.01M16 9h.01M8 13h.01M12 13h.01M16 13h.01"/></svg>',
+    key: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v4"/></svg>',
+    target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>',
+    up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>',
+    down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></svg>',
+    data: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>'
+  };
+
+  var PALETTE = ['#2f4bff', '#7a4dff', '#0b9b6b', '#e08600', '#e2557b', '#00a0b4'];
+
+  function esc(s) { return Chart.esc(s); }
+  function pct(v) { return Math.round(v) + '%'; }
+  function avgText(v) { return v === null || v === undefined ? '—' : v.toFixed(1); }
+
+  function brandOf(id) { return Store.brandOf(id); }
+
+  function deltaPill(diff, opts) {
+    opts = opts || {};
+    if (diff === null || diff === undefined) return '<span class="delta na" title="전일 기록 없음">–</span>';
+    if (diff === 0) return '<span class="delta flat">-</span>';
+    if (diff > 0) return '<span class="delta up">▲' + diff + '</span>';
+    return '<span class="delta down">▼' + Math.abs(diff) + '</span>';
+  }
+
+  function rankBadge(row) {
+    if (row.status === 'none') return '<span class="rank-badge none">–</span>';
+    if (row.rank === null) return '<span class="rank-badge out">권외</span>';
+    var cls = row.rank <= 3 ? 'top3' : row.rank <= 5 ? 'top5' : row.rank <= 10 ? 'top10' : 'low';
+    return '<span class="rank-badge ' + cls + '">' + row.rank + '<i>위</i></span>';
+  }
+
+  function achBadge(a) {
+    if (a === 'met') return '<span class="badge met">' + ICON.check + '달성</span>';
+    if (a === 'near') return '<span class="badge near">근접</span>';
+    if (a === 'miss') return '<span class="badge miss">미달</span>';
+    return '<span class="badge na">–</span>';
+  }
+
+  function statusBadge(row, date) {
+    if (row.status === 'none') return '<span class="st st-none">' + ICON.alert + '미확인</span>';
+    var r = Store.record(row.kw, date || '');
+    var at = '';
+    if (r && r.at) at = r.at;
+    if (row.status === 'out') return '<span class="st st-out">권외' + (at ? ' · ' + at : '') + '</span>';
+    if (row.status === 'manual') return '<span class="st st-manual">수동 ' + at + '</span>';
+    return '<span class="st st-auto">자동 ' + at + '</span>';
+  }
+
+  function placeLinks(branch, keyword) {
+    if (!branch) return '';
+    var place = branch.placeId
+      ? 'https://m.place.naver.com/restaurant/' + encodeURIComponent(branch.placeId)
+      : '';
+    var search = 'https://search.naver.com/search.naver?ssc=tab.place.all&where=place&query=' +
+      encodeURIComponent(keyword ? branch.name + ' ' + keyword : branch.name);
+    var out = '';
+    if (place) out += '<a class="mini-link" href="' + place + '" target="_blank" rel="noopener">' + ICON.link + '플레이스</a>';
+    out += '<a class="mini-link quiet" href="' + search + '" target="_blank" rel="noopener">' + ICON.search + (place ? '순위 확인' : '검색 확인') + '</a>';
+    return out;
+  }
+
+  /* ------------------------------------------------------------------ KPI --- */
+  function kpiCard(o) {
+    return '<article class="kpi ' + (o.tone || '') + '">' +
+      '<div class="kpi-top"><span class="kpi-label">' + esc(o.label) + '</span><span class="kpi-ico">' + (o.icon || '') + '</span></div>' +
+      '<div class="kpi-value">' + o.value + (o.unit ? '<span class="unit">' + esc(o.unit) + '</span>' : '') + '</div>' +
+      '<div class="kpi-sub">' + o.sub + '</div>' +
+      '</article>';
+  }
+
+  function kpis(m) {
+    var targetTop = Store.state.settings.targetTop || 5;
+    var avgDiff = m.avgDiff;
+    var avgSub = avgDiff === null
+      ? '비교할 전일 기록이 없습니다'
+      : '전일 ' + avgText(m.prevAvg) + '위 → ' + (avgDiff > 0 ? '<b class="t-up">▲' + avgDiff.toFixed(1) + '</b>' : avgDiff < 0 ? '<b class="t-down">▼' + Math.abs(avgDiff).toFixed(1) + '</b>' : '변동 없음');
+
+    var moveBars = '';
+    var total = Math.max(1, m.up + m.down + m.flat);
+    moveBars = '<span class="move-bar">' +
+      '<i style="width:' + (m.up / total * 100).toFixed(0) + '%;background:var(--green)"></i>' +
+      '<i style="width:' + (m.flat / total * 100).toFixed(0) + '%;background:#cfd6e8"></i>' +
+      '<i style="width:' + (m.down / total * 100).toFixed(0) + '%;background:var(--red)"></i></span>';
+
+    return kpiCard({
+      label: '관리 지점', icon: ICON.building, value: m.branches, unit: '개 지점',
+      sub: '추적 키워드 <b>' + m.count + '</b>개 · 오늘 측정 <b>' + m.measured + '</b>개'
+    }) + kpiCard({
+      label: '오늘 평균 순위', icon: ICON.trend, value: avgText(m.avg), unit: '위',
+      sub: avgSub, tone: 'accent'
+    }) + kpiCard({
+      label: 'Top ' + targetTop + ' 진입', icon: ICON.target, value: m.top5, unit: '개',
+      sub: '측정 ' + m.measured + '개 중 <b>' + m.top5Rate + '%</b>'
+    }) + kpiCard({
+      label: '전일 대비 변동', icon: ICON.up, value: '<span class="t-up">▲' + m.up + '</span> <span class="t-down">▼' + m.down + '</span>',
+      sub: moveBars + '<span class="move-legend">유지 ' + m.flat + ' · 미확인 ' + m.pending + '</span>'
+    }) + kpiCard({
+      label: '목표 달성', icon: ICON.check, value: m.met, unit: '개',
+      sub: m.count ? m.count + '개 중 ' + pct(m.count ? m.met / m.count * 100 : 0) + ' · 근접 <b>' + m.near + '</b>개' : '키워드를 추가해 주세요'
+    });
+  }
+
+  /* --------------------------------------------------------------- filters -- */
+  function brandChips(ui) {
+    var brands = Store.state.brands;
+    var counts = {};
+    Store.state.keywords.forEach(function (k) {
+      var b = Store.branchOf(k.branchId);
+      if (!b) return;
+      counts[b.brandId] = (counts[b.brandId] || 0) + 1;
+    });
+    var out = '<button class="chip' + (ui.brand === 'all' ? ' on' : '') + '" data-act="brand" data-id="all">전체 <span>' + Store.state.keywords.length + '</span></button>';
+    brands.forEach(function (b) {
+      var on = ui.brand === b.id;
+      out += '<button class="chip' + (on ? ' on' : '') + '" data-act="brand" data-id="' + b.id + '"' +
+        (on ? ' style="--chip:' + b.color + ';--chip-soft:' + b.soft + '"' : '') + '>' +
+        '<i class="chip-dot" style="background:' + b.color + '"></i>' + esc(b.name) +
+        ' <span>' + (counts[b.id] || 0) + '</span></button>';
+    });
+    return out;
+  }
+
+  function branchOptions(ui, includeAll) {
+    var list = Store.state.branches.filter(function (b) { return ui.brand === 'all' || b.brandId === ui.brand; });
+    var out = includeAll ? '<option value="all">전체 지점</option>' : '';
+    list.forEach(function (b) {
+      out += '<option value="' + b.id + '"' + (ui.branch === b.id ? ' selected' : '') + '>' + esc(b.name) + '</option>';
+    });
+    return out;
+  }
+
+  /* ----------------------------------------------------------------- chart -- */
+  function avgSeries(list, dates) {
+    return dates.map(function (d) {
+      var vals = list.map(function (k) { return Store.rankOn(k, d); })
+        .filter(function (v) { return typeof v === 'number'; });
+      return { date: d, rank: vals.length ? vals.reduce(function (s, v) { return s + v; }, 0) / vals.length : null };
+    });
+  }
+
+  function buildSeries(ui, date) {
+    var range = ui.range || 14;
+    var dates = Store.daysEnding(date, range);
+    var list = Store.filterKeywords({ brand: ui.brand, branch: ui.branch, q: ui.q });
+    var out = [];
+    var focus = ui.focus || { type: 'all' };
+
+    if (focus.type === 'keyword') {
+      var kw = Store.keywordOf(focus.id);
+      if (kw) {
+        var branch = Store.branchOf(kw.branchId);
+        out.push({ id: 'kw', label: kw.text, color: PALETTE[0], points: Store.seriesOf(kw, date, range) });
+        var sibs = Store.keywordsOf(kw.branchId);
+        if (sibs.length > 1) {
+          out.push({ id: 'avg', label: (branch ? branch.short : '') + ' 평균', color: '#8a93a7', dash: true, points: avgSeries(sibs, dates) });
+        }
+        return { series: out, dates: dates, scopeLabel: (branch ? branch.name : '') + ' · ' + kw.text, focus: focus };
+      }
+      ui.focus = { type: 'all' };
+    }
+    if (focus.type === 'branch') {
+      var br = Store.branchOf(focus.id);
+      if (br) {
+        var kws = Store.keywordsOf(br.id);
+        kws.forEach(function (k, i) {
+          out.push({ id: k.id, label: k.text, color: PALETTE[i % PALETTE.length], points: Store.seriesOf(k, date, range) });
+        });
+        if (kws.length > 1) out.push({ id: 'avg', label: '지점 평균', color: '#5b667e', dash: true, points: avgSeries(kws, dates) });
+        return { series: out, dates: dates, scopeLabel: br.name + ' · 키워드 ' + kws.length + '개', focus: focus };
+      }
+      ui.focus = { type: 'all' };
+    }
+
+    /* 전체: 오늘 순위가 가장 좋은 키워드 3개 */
+    var measured = list.map(function (k) { return { k: k, r: Store.rankOn(k, date) }; })
+      .filter(function (x) { return x.r !== null; })
+      .sort(function (a, b) { return a.r - b.r; });
+    measured.slice(0, 3).forEach(function (x, i) {
+      out.push({
+        id: x.k.id,
+        label: x.k.text,
+        color: PALETTE[i % PALETTE.length],
+        points: Store.seriesOf(x.k, date, range)
+      });
+    });
+    return { series: out, dates: dates, scopeLabel: '전체 ' + list.length + '개 키워드 중 상위 3개 · 키워드를 누르면 개별 추이', focus: { type: 'all' } };
+  }
+
+  function renderChart(ui, date) {
+    var host = document.getElementById('chartWrap');
+    var data = buildSeries(ui, date);
+    var hidden = ui.hidden || {};
+    var visible = data.series.filter(function (s) { return !hidden[s.id]; });
+
+    var legend = data.series.map(function (s) {
+      var off = !!hidden[s.id];
+      return '<button class="legend' + (off ? ' off' : '') + '" data-act="toggle-series" data-id="' + esc(s.id) + '">' +
+        '<i style="background:' + s.color + (s.dash ? ';opacity:.55' : '') + '"></i>' + esc(s.label) + '</button>';
+    }).join('');
+
+    document.getElementById('chartScope').innerHTML = esc(data.scopeLabel) +
+      (data.focus.type !== 'all' ? ' <button class="btn-link" data-act="focus-all">전체 보기</button>' : '');
+    document.getElementById('chartLegend').innerHTML = legend;
+
+    if (!data.series.length) {
+      host.innerHTML = '<div class="chart-empty">' + ICON.key +
+        '<p><b>추적할 키워드가 없습니다.</b><br>지점·키워드 화면에서 지점과 키워드를 먼저 등록해 주세요.</p>' +
+        '<button class="btn sm soft" data-act="add-kw">' + ICON.plus + '키워드 추가</button></div>';
+      document.getElementById('chartNote').textContent = '';
+      return;
+    }
+    if (!visible.length) {
+      host.innerHTML = '<div class="chart-empty">' + ICON.alert + '<p>표시할 추이를 모두 껐습니다. 범례를 눌러 다시 켜 주세요.</p></div>';
+      return;
+    }
+    Chart.render(host, {
+      series: visible, dates: data.dates, today: date,
+      height: window.innerWidth < 760 ? 240 : 316,
+      ariaLabel: data.scopeLabel + ' 최근 ' + data.dates.length + '일 순위 추이. 1위가 위쪽입니다.'
+    });
+
+    var hasGap = data.series.some(function (s) { return s.points.some(function (p) { return p.rank === null; }); });
+    document.getElementById('chartNote').innerHTML = hasGap
+      ? '1위가 맨 위입니다 · 권외(100위 밖)나 미확인 날짜는 선이 끊깁니다'
+      : '1위가 맨 위입니다 · 점을 눌러도 날짜별 순위가 표시됩니다';
+  }
+
+  /* -------------------------------------------------------------- insights -- */
+  function renderInsights(ui, date) {
+    var m = Store.metrics(date, Store.filterKeywords({ brand: ui.brand, branch: ui.branch, q: ui.q }));
+    var risers = m.rows.filter(function (r) { return r.delta !== null && r.delta > 0; })
+      .sort(function (a, b) { return b.delta - a.delta; }).slice(0, 3);
+    var fallers = m.rows.filter(function (r) { return r.delta !== null && r.delta < 0; })
+      .sort(function (a, b) { return a.delta - b.delta; }).slice(0, 3);
+    var nearGoal = m.rows.filter(function (r) { return r.achievement === 'near'; })
+      .sort(function (a, b) { return (a.rank - a.target) - (b.rank - b.target); }).slice(0, 3);
+    var pending = m.rows.filter(function (r) { return r.status === 'none'; });
+
+    function line(r, right) {
+      return '<li data-act="focus-kw" data-id="' + r.kw.id + '" tabindex="0" role="button">' +
+        '<span class="ins-kw">' + esc(r.kw.text) + '<em>' + esc(r.branch ? r.branch.short : '') + '</em></span>' +
+        '<span class="ins-right">' + right + '</span></li>';
+    }
+    var html = '<div class="insight-head"><h3>오늘 체크 포인트</h3>' +
+      '<span class="tiny">' + Store.fmtDate(date) + ' 기준</span></div>';
+
+    html += '<div class="insight-sec"><h4><i class="dot up"></i>상승</h4>';
+    html += risers.length
+      ? '<ul>' + risers.map(function (r) { return line(r, '<b class="t-up">▲' + r.delta + '</b><span class="ins-rank">' + r.rank + '위</span>'); }).join('') + '</ul>'
+      : '<p class="ins-empty">전일 대비 상승한 키워드가 없습니다.</p>';
+    html += '</div>';
+
+    html += '<div class="insight-sec"><h4><i class="dot down"></i>하락</h4>';
+    html += fallers.length
+      ? '<ul>' + fallers.map(function (r) { return line(r, '<b class="t-down">▼' + Math.abs(r.delta) + '</b><span class="ins-rank">' + r.rank + '위</span>'); }).join('') + '</ul>'
+      : '<p class="ins-empty">하락한 키워드가 없습니다. 좋은 흐름입니다.</p>';
+    html += '</div>';
+
+    html += '<div class="insight-sec"><h4><i class="dot goal"></i>목표까지 한 걸음</h4>';
+    html += nearGoal.length
+      ? '<ul>' + nearGoal.map(function (r) {
+        return line(r, '<span class="ins-gap">' + (r.rank - r.target) + '계단</span><span class="ins-rank">목표 ' + r.target + '위</span>');
+      }).join('') + '</ul>'
+      : '<p class="ins-empty">목표에 근접한 키워드가 없습니다.</p>';
+    html += '</div>';
+
+    html += '<div class="insight-sec"><h4><i class="dot none"></i>확인 필요</h4>';
+    if (!m.count) {
+      html += '<p class="ins-empty">추적 중인 키워드가 없습니다. 지점·키워드를 먼저 등록해 주세요.</p>';
+    } else if (pending.length) {
+      html += '<ul>' + pending.slice(0, 3).map(function (r) {
+        return line(r, '<button class="btn xs soft" data-act="edit-rank" data-id="' + r.kw.id + '">입력</button>');
+      }).join('') + '</ul>';
+      if (pending.length > 3) html += '<p class="ins-empty">외 ' + (pending.length - 3) + '개</p>';
+    } else {
+      html += '<p class="ins-empty">오늘 측정이 모두 끝났습니다.</p>';
+    }
+    html += '</div>';
+
+    document.getElementById('insightCard').innerHTML = html;
+  }
+
+  /* ----------------------------------------------------------------- table -- */
+  function groupRows(rows, sort) {
+    var groups = [];
+    var map = {};
+    rows.forEach(function (r) {
+      var id = r.branch ? r.branch.id : 'none';
+      if (!map[id]) {
+        map[id] = { branch: r.branch, brand: r.brand, rows: [] };
+        groups.push(map[id]);
+      }
+      map[id].rows.push(r);
+    });
+    if (sort === 'rank') {
+      rows.sort(function (a, b) {
+        var av = a.rank === null ? 999 : a.rank, bv = b.rank === null ? 999 : b.rank;
+        return av - bv;
+      });
+      groups = [];
+      map = {};
+      rows.forEach(function (r) {
+        var id = r.branch ? r.branch.id : 'none';
+        if (!map[id]) { map[id] = { branch: r.branch, brand: r.brand, rows: [] }; groups.push(map[id]); }
+        map[id].rows.push(r);
+      });
+    }
+    if (sort === 'move') groups.sort(function (a, b) {
+      var f = function (g) { return g.rows.reduce(function (s, r) { return s + (r.delta || 0); }, 0); };
+      return f(b) - f(a);
+    });
+    return groups;
+  }
+
+  function branchHeader(g, date) {
+    var rows = g.rows;
+    var avgVals = rows.map(function (r) { return r.rank; }).filter(function (v) { return v !== null; });
+    var avg = avgVals.length ? avgVals.reduce(function (s, v) { return s + v; }, 0) / avgVals.length : null;
+    var top5 = avgVals.filter(function (v) { return v <= (Store.state.settings.targetTop || 5); }).length;
+    var b = g.branch;
+    return '<tr class="branch-row" data-act="focus-branch" data-id="' + (b ? b.id : '') + '" tabindex="0">' +
+      '<td colspan="8" style="--bc:' + g.brand.color + '">' +
+      '<span class="b-color"></span>' +
+      '<b>' + esc(b ? b.name : '지점 미지정') + '</b>' +
+      '<span class="b-area">' + esc((b && b.area) || '') + '</span>' +
+      '<span class="b-stats">평균 <b>' + avgText(avg) + '</b>위 · Top ' + (Store.state.settings.targetTop || 5) + ' <b>' + top5 + '</b>/' + rows.length + '</span>' +
+      (b ? '<span class="b-links">' + placeLinks(b, '') + '</span>' : '') +
+      '<span class="b-more">' + ICON.trend + '추이 보기</span>' +
+      '</td></tr>';
+  }
+
+  function tableHTML(rows, date, sort) {
+    var groups = groupRows(rows, sort);
+    if (!groups.length) {
+      return '<div class="empty">' + ICON.key + '<p><b>조건에 맞는 키워드가 없습니다.</b><br>필터를 바꾸거나 새 키워드를 추가해 주세요.</p>' +
+        '<button class="btn sm primary" data-act="add-kw">' + ICON.plus + '키워드 추가</button></div>';
+    }
+    var html = '<div class="table-wrap"><table class="rank-table"><thead><tr>' +
+      '<th class="th-kw">키워드</th><th class="th-rank">오늘 순위</th><th class="th-delta">전일</th>' +
+      '<th class="th-7d">7일 최고/최저</th><th class="th-goal">목표</th><th class="th-status">확인 상태</th>' +
+      '<th class="th-link">네이버</th><th class="th-man"><span class="sr-only">관리</span></th>' +
+      '</tr></thead>';
+    groups.forEach(function (g) {
+      html += '<tbody>' + branchHeader(g, date);
+      g.rows.forEach(function (r) {
+        html += '<tr class="kw-row' + (r.status === 'none' ? ' is-pending' : '') + '" data-id="' + r.kw.id + '">' +
+          '<td class="td-kw"><button class="kw-name" data-act="focus-kw" data-id="' + r.kw.id + '" data-date="' + date + '">' +
+          esc(r.kw.text) + '</button>' +
+          (r.kw.priority === 'main' ? '<span class="tag is-main">메인</span>' : '') +
+          '<span class="kw-branch">' + esc(r.branch ? r.branch.short : '') + '</span></td>' +
+          '<td class="td-rank"><button class="rank-btn" data-act="edit-rank" data-id="' + r.kw.id + '" title="오늘 순위 수정">' + rankBadge(r) + '</button></td>' +
+          '<td class="td-delta">' + deltaPill(r.delta) + (r.delta !== null ? '<span class="prev">' + r.prev + '위</span>' : '') + '</td>' +
+          '<td class="td-7d"><span class="bw"><b>' + (r.best === null ? '–' : r.best) + '</b><i>/</i>' + (r.worst === null ? '–' : r.worst) + '</span>' +
+          Chart.spark(r.spark, r.brand.color) + '</td>' +
+          '<td class="td-goal"><span class="goal">' + r.target + '위</span>' + achBadge(r.achievement) + '</td>' +
+          '<td class="td-status">' + statusBadge(r, date) + '</td>' +
+          '<td class="td-link">' + placeLinks(r.branch, r.kw.text) + '</td>' +
+          '<td class="td-man">' +
+          '<button class="icon-btn sm" data-act="edit-kw" data-id="' + r.kw.id + '" title="키워드 수정" aria-label="' + esc(r.kw.text) + ' 수정">' + ICON.edit + '</button>' +
+          '<button class="icon-btn sm danger" data-act="del-kw" data-id="' + r.kw.id + '" title="키워드 삭제" aria-label="' + esc(r.kw.text) + ' 삭제">' + ICON.trash + '</button>' +
+          '</td></tr>';
+      });
+      html += '</tbody>';
+    });
+    html += '</table></div>';
+    return html;
+  }
+
+  function cardsHTML(rows, date, sort) {
+    var groups = groupRows(rows, sort);
+    if (!groups.length) {
+      return '<div class="empty">' + ICON.key + '<p><b>조건에 맞는 키워드가 없습니다.</b><br>필터를 바꾸거나 새 키워드를 추가해 주세요.</p>' +
+        '<button class="btn sm primary" data-act="add-kw">' + ICON.plus + '키워드 추가</button></div>';
+    }
+    var html = '';
+    groups.forEach(function (g) {
+      var avgVals = g.rows.map(function (r) { return r.rank; }).filter(function (v) { return v !== null; });
+      var avg = avgVals.length ? avgVals.reduce(function (s, v) { return s + v; }, 0) / avgVals.length : null;
+      html += '<section class="m-group" style="--bc:' + g.brand.color + '">' +
+        '<header class="m-branch" data-act="focus-branch" data-id="' + (g.branch ? g.branch.id : '') + '">' +
+        '<div><span class="brand-tag" style="background:' + g.brand.soft + ';color:' + g.brand.ink + '">' + esc(g.brand.name) + '</span>' +
+        '<h3>' + esc(g.branch ? g.branch.name : '지점 미지정') + '</h3>' +
+        '<p>' + esc((g.branch && g.branch.area) || '') + ' · 평균 ' + avgText(avg) + '위</p></div>' +
+        '<span class="m-more">' + ICON.trend + '</span></header>';
+      g.rows.forEach(function (r) {
+        html += '<article class="kw-card' + (r.status === 'none' ? ' is-pending' : '') + '">' +
+          '<div class="kc-main">' +
+          '<div class="kc-left"><h4><button data-act="focus-kw" data-id="' + r.kw.id + '">' + esc(r.kw.text) + '</button>' +
+          (r.kw.priority === 'main' ? '<span class="tag is-main">메인</span>' : '') + '</h4>' +
+          '<p class="kc-meta">목표 ' + r.target + '위 · ' + (r.status === 'none' ? '미확인' : (r.status === 'out' ? '권외' : '7일 ' + (r.best === null ? '–' : r.best) + '~' + (r.worst === null ? '–' : r.worst) + '위')) + '</p></div>' +
+          '<div class="kc-right"><button class="rank-btn" data-act="edit-rank" data-id="' + r.kw.id + '">' + rankBadge(r) + '</button>' +
+          deltaPill(r.delta) + '</div></div>' +
+          '<div class="kc-foot">' + achBadge(r.achievement) + statusBadge(r, date) + placeLinks(r.branch, r.kw.text) + '</div>' +
+          '</article>';
+      });
+      html += '</section>';
+    });
+    return html;
+  }
+
+  /* ---------------------------------------------------------------- manage -- */
+  function manageHTML() {
+    var s = Store.state;
+    var cards = s.branches.map(function (b) {
+      var brand = Store.brandById(b.brandId);
+      var kws = Store.keywordsOf(b.id);
+      var vals = kws.map(function (k) { return Store.rankOn(k, Store.today()); }).filter(function (v) { return v !== null; });
+      var avg = vals.length ? vals.reduce(function (x, y) { return x + y; }, 0) / vals.length : null;
+      var top5 = vals.filter(function (v) { return v <= (s.settings.targetTop || 5); }).length;
+      return '<article class="branch-card" style="--bc:' + brand.color + '">' +
+        '<div class="bc-top"><span class="brand-tag" style="background:' + brand.soft + ';color:' + brand.ink + '">' + esc(brand.name) + '</span>' +
+        (b.placeId ? '<span class="bc-place">플레이스 연결</span>' : '') + '</div>' +
+        '<h3>' + esc(b.name) + '</h3>' +
+        '<p class="bc-area">' + esc(b.area || '지역 미입력') + '</p>' +
+        '<div class="bc-stats"><div><b>' + kws.length + '</b><span>키워드</span></div>' +
+        '<div><b>' + avgText(avg) + '</b><span>오늘 평균</span></div>' +
+        '<div><b>' + top5 + '</b><span>Top' + (s.settings.targetTop || 5) + ' 진입</span></div></div>' +
+        (b.memo ? '<p class="bc-memo">' + esc(b.memo) + '</p>' : '') +
+        '<div class="bc-foot">' + placeLinks(b, '') +
+        '<span class="bc-actions"><button class="icon-btn sm" data-act="edit-branch" data-id="' + b.id + '" title="지점 수정" aria-label="' + esc(b.name) + ' 수정">' + ICON.edit + '</button>' +
+        '<button class="icon-btn sm danger" data-act="del-branch" data-id="' + b.id + '" title="지점 삭제" aria-label="' + esc(b.name) + ' 삭제">' + ICON.trash + '</button></span></div>' +
+        '</article>';
+    }).join('');
+
+    var kwRows = s.keywords.map(function (k) {
+      var b = Store.branchOf(k.branchId);
+      var brand = brandOf(k.branchId);
+      var todayRank = Store.rankOn(k, Store.today());
+      var dates = Object.keys(k.records || {}).sort();
+      var last = dates.length ? dates[dates.length - 1] : '';
+      return '<tr>' +
+        '<td><span class="brand-dot" style="background:' + brand.color + '"></span>' + esc(b ? b.name : '미지정') + '</td>' +
+        '<td><button class="kw-name" data-act="edit-kw" data-id="' + k.id + '">' + esc(k.text) + '</button> ' +
+        (k.priority === 'main' ? '<span class="tag is-main">메인</span>' : '') + '</td>' +
+        '<td>' + k.target + '위</td>' +
+        '<td>' + (todayRank === null ? '<span class="muted">기록 없음</span>' : todayRank + '위') + '</td>' +
+        '<td class="mono tiny">' + (last || '–') + '</td>' +
+        '<td>' + (k.active === false ? '<span class="badge na">중지</span>' : '<span class="badge met">추적 중</span>') + '</td>' +
+        '<td class="td-man"><button class="icon-btn sm" data-act="edit-kw" data-id="' + k.id + '" title="수정">' + ICON.edit + '</button>' +
+        '<button class="icon-btn sm danger" data-act="del-kw" data-id="' + k.id + '" title="삭제">' + ICON.trash + '</button></td>' +
+        '</tr>';
+    }).join('');
+
+    document.getElementById('manageHost').innerHTML =
+      '<div class="page-head">' +
+      '<div><span class="eyebrow">BRANCH &amp; KEYWORD</span><h1>지점 · 키워드 관리</h1>' +
+      '<p>지점과 추적 키워드를 추가하면 순위표·차트·리포트에 바로 반영됩니다.</p></div>' +
+      '<div class="head-actions"><button class="btn ghost" data-act="add-kw">' + ICON.plus + '키워드 추가</button>' +
+      '<button class="btn primary" data-act="add-branch">' + ICON.plus + '지점 추가</button></div></div>' +
+      '<div class="manage-grid">' + cards +
+      '<button class="branch-card add-card" data-act="add-branch"><span class="add-ico">' + ICON.plus + '</span><b>새 지점 추가</b><span>브랜드·지역·플레이스 ID를 등록합니다</span></button>' +
+      '</div>' +
+      '<div class="card table-card">' +
+      '<div class="card-head"><div><h2>추적 키워드 <span class="count">' + s.keywords.length + '</span></h2>' +
+      '<p>키워드를 누르면 수정할 수 있습니다. 목표 순위는 리포트 달성 배지 기준입니다.</p></div>' +
+      '<button class="btn sm ghost" data-act="add-kw">' + ICON.plus + '추가</button></div>' +
+      (s.keywords.length ? '<div class="table-wrap"><table class="rank-table manage-table"><thead><tr>' +
+        '<th>지점</th><th>키워드</th><th>목표</th><th>오늘 순위</th><th>최근 기록일</th><th>상태</th><th></th></tr></thead><tbody>' +
+        kwRows + '</tbody></table></div>'
+        : '<div class="empty">' + ICON.key + '<p>아직 등록된 키워드가 없습니다.</p><button class="btn sm primary" data-act="add-kw">키워드 추가</button></div>') +
+      '</div>' +
+      '<div class="card data-card">' +
+      '<div class="card-head"><div><h2>데이터 가져오기 · 내보내기</h2>' +
+      '<p>매일 자동 수집 스크립트가 만든 JSON/CSV를 그대로 불러올 수 있습니다. 모든 기록은 이 브라우저(localStorage)에 저장됩니다.</p></div></div>' +
+      '<div class="data-grid">' +
+      '<div class="data-box"><h4>' + ICON.upload + '가져오기</h4><p>JSON(순위 기록·전체 백업) 또는 CSV(지점별·일자별)</p>' +
+      '<div class="btn-row"><button class="btn sm primary" data-act="import-json">JSON 가져오기</button>' +
+      '<button class="btn sm ghost" data-act="import-csv">CSV 가져오기</button></div></div>' +
+      '<div class="data-box"><h4>' + ICON.download + '내보내기</h4><p>현재 필터 기준으로 내려받거나 전체를 백업합니다.</p>' +
+      '<div class="btn-row"><button class="btn sm ghost" data-act="export-csv">CSV · 지점별</button>' +
+      '<button class="btn sm ghost" data-act="export-csv-long">CSV · 일자별</button>' +
+      '<button class="btn sm ghost" data-act="export-json">JSON 백업</button></div></div>' +
+      '<div class="data-box danger-box"><h4>' + ICON.alert + '초기화</h4><p>샘플 데이터로 되돌리거나 모든 지점·기록을 비웁니다. 되돌릴 수 없습니다.</p>' +
+      '<div class="btn-row"><button class="btn sm ghost" data-act="reset-demo">샘플 데이터로</button>' +
+      '<button class="btn sm danger" data-act="reset-blank">전체 비우기</button></div></div>' +
+      '</div>' +
+      '<details class="schema"><summary>자동 수집 JSON 규격 보기</summary>' +
+      '<pre>{\n  "kind": "place-rank-check",\n  "date": "2026-11-26",\n  "checkedAt": "2026-11-26T09:05:00+09:00",\n  "items": [\n    { "brand": "룸의정석", "branch": "룸의정석 홍대점",\n      "keyword": "홍대 헌팅포차", "rank": 4,\n      "status": "auto", "at": "09:05" }\n  ]\n}</pre>' +
+      '<p class="tiny">rank 에 <b>권외</b>·<b>100+</b> 를 넣으면 100위 밖으로 기록됩니다. 지점·키워드가 없으면 "자동 추가"를 켜 두면 새로 만들어집니다.</p>' +
+      '</details>' +
+      '</div>';
+  }
+
+  /* ---------------------------------------------------------------- report -- */
+  function reportScope(ui) {
+    return {
+      brand: ui.rBrand || 'all',
+      branch: ui.rBranch || 'all',
+      title: ui.rTitle || ''
+    };
+  }
+
+  function reportDoc(ui, date) {
+    var scope = reportScope(ui);
+    var list = Store.filterKeywords({ brand: scope.brand, branch: scope.branch });
+    var m = Store.metrics(date, list);
+    var brandName = scope.brand === 'all' ? '전체 브랜드'
+      : (Store.state.brands.filter(function (b) { return b.id === scope.brand; })[0] || {}).name;
+    var title = (scope.title || brandName + ' 플레이스 순위 보고').trim();
+    var dates = Store.daysEnding(date, 14);
+    var period = Store.fmtFull(dates[0]) + ' ~ ' + Store.fmtFull(date);
+
+    var groups = groupRows(m.rows, 'default');
+
+    var body = groups.map(function (g) {
+      var rows = g.rows;
+      var avgVals = rows.map(function (r) { return r.rank; }).filter(function (v) { return v !== null; });
+      var avg = avgVals.length ? avgVals.reduce(function (s, v) { return s + v; }, 0) / avgVals.length : null;
+      var top5 = avgVals.filter(function (v) { return v <= (Store.state.settings.targetTop || 5); }).length;
+      return '<section class="rd-branch">' +
+        '<div class="rd-branch-head"><h3>' + esc(g.branch ? g.branch.name : '지점 미지정') + '</h3>' +
+        '<span>' + esc((g.branch && g.branch.area) || '') + ' · 평균 ' + avgText(avg) + '위 · Top 5 ' + top5 + '/' + rows.length + '</span></div>' +
+        '<table class="rd-table"><thead><tr><th>키워드</th><th>현재</th><th>전일</th><th>7일 최고/최저</th><th>목표</th><th>판정</th><th>최근 7일</th></tr></thead><tbody>' +
+        rows.map(function (r) {
+          return '<tr class="' + (r.status === 'none' ? 'pending' : '') + '">' +
+            '<td class="rd-kw">' + esc(r.kw.text) + '</td>' +
+            '<td><b>' + (r.status === 'none' ? '미확인' : r.rank === null ? '권외' : r.rank + '위') + '</b></td>' +
+            '<td>' + (r.delta === null ? '–' : (r.delta > 0 ? '▲' + r.delta : r.delta < 0 ? '▼' + Math.abs(r.delta) : '-')) + '</td>' +
+            '<td>' + (r.best === null ? '–' : r.best + ' / ' + r.worst) + '</td>' +
+            '<td>' + r.target + '위</td>' +
+            '<td>' + (r.achievement === 'met' ? '달성' : r.achievement === 'near' ? '근접' : r.achievement === 'miss' ? '미달' : '–') + '</td>' +
+            '<td>' + Chart.spark(r.spark, r.brand.color, 70, 20) + '</td></tr>';
+        }).join('') + '</tbody></table></section>';
+    }).join('');
+
+    var bestRiser = m.rows.filter(function (r) { return r.delta !== null && r.delta > 0; }).sort(function (a, b) { return b.delta - a.delta; })[0];
+    var worst = m.rows.filter(function (r) { return r.delta !== null && r.delta < 0; }).sort(function (a, b) { return a.delta - b.delta; })[0];
+    var comment = [];
+    comment.push('이번 기간 ' + m.count + '개 키워드의 평균 순위는 ' + avgText(m.avg) + '위' +
+      (m.avgDiff === null ? '' : (m.avgDiff > 0 ? '로 전일 대비 ' + m.avgDiff.toFixed(1) + '계단 상승했습니다.' : m.avgDiff < 0 ? '로 전일 대비 ' + Math.abs(m.avgDiff).toFixed(1) + '계단 하락했습니다.' : '로 전일과 같습니다.')));
+    comment.push('Top ' + (Store.state.settings.targetTop || 5) + ' 진입 키워드는 ' + m.top5 + '개(' + m.top5Rate + '%), 목표 순위 달성은 ' + m.met + '개입니다.');
+    if (bestRiser) comment.push('가장 큰 상승은 ' + bestRiser.branch.name.replace(bestRiser.brand.name + ' ', '') + '의 “' + bestRiser.kw.text + '”(' + bestRiser.delta + '계단 상승, ' + bestRiser.rank + '위)입니다.');
+    if (worst) comment.push('하락 폭이 큰 키워드는 “' + worst.kw.text + '”(' + Math.abs(worst.delta) + '계단 하락, ' + worst.rank + '위)로 다음 주 재점검이 필요합니다.');
+    if (m.pending) comment.push('미확인 키워드 ' + m.pending + '건은 측정 후 반영하겠습니다.');
+
+    document.getElementById('reportDoc').innerHTML =
+      '<div class="report-doc">' +
+      '<header class="rd-head"><div class="rd-org"><span class="rd-mark">G</span><div><b>그로스코리아</b><span>GROWTH KOREA</span></div></div>' +
+      '<div class="rd-date">' + Store.fmtFull(date) + '</div></header>' +
+      '<h1>' + esc(title) + '</h1>' +
+      '<p class="rd-period">' + period + ' · 네이버 플레이스 키워드 순위 · ' + esc(brandName) + '</p>' +
+      '<div class="rd-kpis">' +
+      '<div><span>관리 지점</span><b>' + m.branches + '</b><em>개</em></div>' +
+      '<div><span>추적 키워드</span><b>' + m.count + '</b><em>개</em></div>' +
+      '<div><span>평균 순위</span><b>' + avgText(m.avg) + '</b><em>위</em></div>' +
+      '<div><span>Top 5</span><b>' + m.top5 + '</b><em>개</em></div>' +
+      '<div><span>목표 달성</span><b>' + m.met + '</b><em>개</em></div>' +
+      '</div>' +
+      (groups.length ? body : '<p class="rd-empty">조건에 해당하는 지점·키워드가 없습니다.</p>') +
+      '<section class="rd-note"><h3>종합 의견</h3><p>' + comment.join(' ') + '</p>' +
+      '<p class="rd-todo">다음 액션 · ' + (m.near ? ('목표 근접 ' + m.near + '개 키워드 집중 관리') : '신규 키워드 발굴') + ' / 상승 키워드 리뷰·콘텐츠 확대</p></section>' +
+      '<footer class="rd-foot"><span>측정 기준 · 네이버 플레이스 검색 결과(모바일) 기준, 지역·기기·시점에 따라 순위가 달라질 수 있습니다.</span>' +
+      '<span>그로스코리아 · GROWTH KOREA</span></footer>' +
+      '</div>';
+  }
+
+  window.Views = {
+    ICON: ICON, PALETTE: PALETTE, esc: esc, avgText: avgText,
+    kpis: kpis, brandChips: brandChips, branchOptions: branchOptions,
+    renderChart: renderChart, renderInsights: renderInsights,
+    tableHTML: tableHTML, cardsHTML: cardsHTML, manageHTML: manageHTML, reportDoc: reportDoc,
+    rankBadge: rankBadge, statusBadge: statusBadge, deltaPill: deltaPill, placeLinks: placeLinks
+  };
+})();
+
+</script>
+<script>
+/* =========================================================================
+   app.js — 화면 전환 · 이벤트 · 입력 폼 · 가져오기/내보내기 · 인쇄
+   ========================================================================= */
+(function () {
+  'use strict';
+
+  var $ = function (sel, root) { return (root || document).querySelector(sel); };
+  var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+
+  var UI = {
+    page: 'dashboard',
+    brand: 'all', branch: 'all', q: '', sort: 'default',
+    viewDate: Store.today(),
+    range: 14,
+    focus: { type: 'all' },
+    hidden: {},
+    rBrand: 'all', rBranch: 'all', rTitle: '', rDate: Store.today()
+  };
+
+  var toastTimer = null;
+
+  /* ----------------------------------------------------------------- util --- */
+  function toast(msg, type) {
+    var el = $('#toast');
+    el.innerHTML = (type === 'error' ? Views.ICON.alert : Views.ICON.check) + '<span>' + Views.esc(msg) + '</span>';
+    el.className = 'toast on' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.className = 'toast'; }, 3000);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { return true; }).catch(function () { return legacyCopy(text); });
+    }
+    return Promise.resolve(legacyCopy(text));
+  }
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+
+  function download(filename, text, mime) {
+    var blob = new Blob([text], { type: (mime || 'text/plain') + ';charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1200);
+  }
+
+  /* --------------------------------------------------------------- render --- */
+  function filteredList() {
+    return Store.filterKeywords({ brand: UI.brand, branch: UI.branch, q: UI.q });
+  }
+
+  function renderDashboard() {
+    var date = UI.viewDate;
+    var list = filteredList();
+    var m = Store.metrics(date, list);
+
+    $('#kpiGrid').innerHTML = Views.kpis(m);
+    $('#brandChips').innerHTML = Views.brandChips(UI);
+
+    var sel = $('#branchSelect');
+    var valid = UI.branch === 'all' || Store.state.branches.some(function (b) {
+      return b.id === UI.branch && (UI.brand === 'all' || b.brandId === UI.brand);
+    });
+    if (!valid) UI.branch = 'all';
+    sel.innerHTML = Views.branchOptions(UI, true);
+    sel.value = UI.branch;
+
+    var search = $('#searchInput');
+    if (document.activeElement !== search && search.value !== UI.q) search.value = UI.q;
+
+    $('#sortSelect').value = UI.sort;
+    $('#tableHost').innerHTML = Views.tableHTML(m.rows, date, UI.sort);
+    $('#cardHost').innerHTML = Views.cardsHTML(m.rows, date, UI.sort);
+    $('#tableCount').textContent = m.count + '개';
+
+    var brandName = UI.brand === 'all' ? '전체 브랜드'
+      : (Store.state.brands.filter(function (b) { return b.id === UI.brand; })[0] || {}).name;
+    var branchName = UI.branch === 'all' ? '전체 지점'
+      : (Store.branchOf(UI.branch) || {}).name;
+    var bits = [brandName, branchName];
+    if (UI.q) bits.push('“' + UI.q + '” 검색');
+    bits.push(m.count + '개 키워드 · 평균 ' + Views.avgText(m.avg) + '위');
+    $('#filterSummary').innerHTML = bits.map(Views.esc).join(' <i class="sep">·</i> ');
+
+    $('#dayLabel').textContent = Store.fmtDate(date);
+    $('#dayState').textContent = date === Store.today() ? '오늘'
+      : date === Store.addDays(Store.today(), -1) ? '어제' : '지난 기록';
+    $('#dayNext').disabled = date >= Store.today();
+
+    var brands = Store.state.brands.map(function (b) { return b.name; }).join('·');
+    $('#heroSub').innerHTML = brands + ' <b>' + m.branches + '개 지점</b> · <b>' + Store.state.keywords.length +
+      '개 키워드</b>의 네이버 플레이스 순위를 매일 기록합니다.';
+
+    Views.renderChart(UI, date);
+    Views.renderInsights(UI, date);
+    renderMeta();
+  }
+
+  function renderMeta() {
+    var s = Store.state;
+    var latest = '';
+    var at = '';
+    s.keywords.forEach(function (k) {
+      var r = k.records[UI.viewDate];
+      if (r) {
+        if (r.at && r.at > at) at = r.at;
+        if (r.at && r.at > latest) latest = r.at;
+      }
+    });
+    var pill = $('#dataPill');
+    var txt = (s.settings.demo ? '샘플 데이터' : '저장됨') + ' · ' + s.keywords.length + '개 키워드';
+    $('#dataPillText').textContent = txt;
+    pill.classList.toggle('demo', !!s.settings.demo);
+    pill.title = s.settings.demo
+      ? '화면 확인용 샘플 데이터입니다. 실제 수집 JSON을 가져오면 자동으로 교체됩니다.'
+      : '이 브라우저에 저장된 데이터';
+    $('#footStamp').innerHTML = at ? ' · 최근 확인 ' + Views.esc(at) : '';
+  }
+
+  function renderManage() {
+    Views.manageHTML();
+  }
+
+  function renderReport() {
+    var date = UI.rDate || Store.today();
+    var brands = '<option value="all">전체 브랜드</option>' + Store.state.brands.map(function (b) {
+      return '<option value="' + b.id + '"' + (UI.rBrand === b.id ? ' selected' : '') + '>' + Views.esc(b.name) + '</option>';
+    }).join('');
+    $('#rBrand').innerHTML = brands;
+
+    var list = Store.state.branches.filter(function (b) { return UI.rBrand === 'all' || b.brandId === UI.rBrand; });
+    if (UI.rBranch !== 'all' && !list.some(function (b) { return b.id === UI.rBranch; })) UI.rBranch = 'all';
+    $('#rBranch').innerHTML = '<option value="all">전체 지점</option>' + list.map(function (b) {
+      return '<option value="' + b.id + '"' + (UI.rBranch === b.id ? ' selected' : '') + '>' + Views.esc(b.name) + '</option>';
+    }).join('');
+
+    $('#rTitle').value = UI.rTitle;
+    $('#rDate').value = date;
+    $('#rDate').max = Store.today();
+    Views.reportDoc(UI, date);
+  }
+
+  function sanitizeUI() {
+    if (UI.brand !== 'all' && !Store.state.brands.some(function (b) { return b.id === UI.brand; })) UI.brand = 'all';
+    if (UI.branch !== 'all' && !Store.branchOf(UI.branch)) UI.branch = 'all';
+    if (UI.focus.type === 'keyword' && !Store.keywordOf(UI.focus.id)) UI.focus = { type: 'all' };
+    if (UI.focus.type === 'branch' && !Store.branchOf(UI.focus.id)) UI.focus = { type: 'all' };
+    UI.hidden = {};
+  }
+
+  function renderAll() {
+    sanitizeUI();
+    if (UI.page === 'dashboard') renderDashboard();
+    if (UI.page === 'manage') renderManage();
+    if (UI.page === 'report') renderReport();
+    renderMeta();
+  }
+
+  function setPage(page) {
+    if (['dashboard', 'manage', 'report'].indexOf(page) < 0) page = 'dashboard';
+    UI.page = page;
+    $$('.page').forEach(function (p) { p.classList.add('hidden'); });
+    $('#page-' + page).classList.remove('hidden');
+    $$('.tabs .tab').forEach(function (t) {
+      var on = t.dataset.page === page;
+      t.classList.toggle('on', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    if (page === 'dashboard') renderDashboard();
+    if (page === 'manage') renderManage();
+    if (page === 'report') renderReport();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (history.replaceState) history.replaceState(null, '', '#' + page);
+  }
+
+  /* ---------------------------------------------------------------- modal --- */
+  function openModal(opts) {
+    var root = $('#modalRoot');
+    root.innerHTML =
+      '<div class="modal-backdrop" data-backdrop="1">' +
+      '<div class="modal ' + (opts.wide ? 'wide' : '') + '" role="dialog" aria-modal="true" aria-labelledby="modalTitle">' +
+      '<header class="modal-head"><div><h3 id="modalTitle">' + opts.title + '</h3>' +
+      (opts.sub ? '<p>' + opts.sub + '</p>' : '') + '</div>' +
+      '<button class="icon-btn" data-close="1" aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>' +
+      '<div class="modal-body">' + opts.body + '</div>' +
+      (opts.foot ? '<footer class="modal-foot">' + opts.foot + '</footer>' : '') +
+      '</div></div>';
+    document.body.classList.add('modal-open');
+    setTimeout(function () {
+      var first = root.querySelector('input:not([type=checkbox]), select, textarea');
+      if (first) first.focus();
+    }, 40);
+    lastFocus = document.activeElement;
+  }
+  var lastFocus = null;
+
+  function closeModal() {
+    $('#modalRoot').innerHTML = '';
+    document.body.classList.remove('modal-open');
+    if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) { /* noop */ } }
+  }
+
+  function fieldError(msg) {
+    var box = $('#formError');
+    if (box) { box.textContent = msg; box.hidden = false; }
+    else toast(msg, 'error');
+  }
+
+  /* --------------------------------------------------------- rank inputs --- */
+  function openRankModal(id) {
+    var kw = Store.keywordOf(id);
+    if (!kw) return;
+    var row = Store.rowOf(kw, UI.viewDate);
+    var branch = Store.branchOf(kw.branchId);
+    var rec = Store.record(kw, UI.viewDate);
+    var cur = rec && typeof rec.rank === 'number' ? rec.rank : '';
+    openModal({
+      title: Views.esc(kw.text),
+      sub: Views.esc(branch ? branch.name : '') + ' · ' + Views.esc(Store.fmtDate(UI.viewDate)),
+      body:
+        '<div class="form-error" id="formError" hidden></div>' +
+        '<div class="rank-edit-head">' +
+        '<div class="re-now"><span>현재 기록</span>' + Views.rankBadge(row) +
+        '<span class="re-delta">' + Views.deltaPill(row.delta) + (row.prev !== null ? ' <small>전일 ' + row.prev + '위</small>' : '') + '</span></div>' +
+        '<div class="re-goal">목표 <b>' + kw.target + '위</b> · 7일 ' + (row.best === null ? '–' : row.best + '~' + row.worst + '위') + '</div>' +
+        '</div>' +
+        '<label class="field">순위 입력' +
+        '<div class="input-with-unit"><input id="rankInput" type="number" min="1" max="100" inputmode="numeric" value="' + cur + '" placeholder="예: 4"><span>위</span></div>' +
+        '</label>' +
+        '<label class="check"><input type="checkbox" id="rankOut"' + (rec && rec.rank === null ? ' checked' : '') + '> 100위 밖(권외)으로 기록</label>' +
+        '<p class="form-hint">입력을 비우고 저장하면 ‘미확인’으로 남습니다. 저장하면 확인 시각이 함께 기록됩니다.</p>',
+      foot: '<button class="btn ghost" data-close="1">취소</button>' +
+        '<button class="btn danger" id="rankClear">기록 삭제</button>' +
+        '<button class="btn primary" id="rankSave">저장</button>'
+    });
+
+    $('#rankOut').addEventListener('change', function () {
+      $('#rankInput').disabled = this.checked;
+    });
+    if (rec && rec.rank === null) $('#rankInput').disabled = true;
+
+    $('#rankSave').addEventListener('click', function () {
+      try {
+        var out = $('#rankOut').checked;
+        var val = $('#rankInput').value.trim();
+        if (!out && val === '') { Store.clearRank(id, UI.viewDate); }
+        else if (out) { Store.setRank(id, UI.viewDate, null, 'manual'); }
+        else {
+          var n = Number(val);
+          if (!isFinite(n) || n < 1) { fieldError('1 이상의 순위를 입력해 주세요.'); return; }
+          Store.setRank(id, UI.viewDate, n, 'manual');
+        }
+        closeModal();
+        renderAll();
+        toast('순위를 저장했습니다.');
+      } catch (e) { fieldError(e.message); }
+    });
+    $('#rankClear').addEventListener('click', function () {
+      Store.clearRank(id, UI.viewDate);
+      closeModal(); renderAll(); toast('기록을 삭제했습니다.');
+    });
+  }
+
+  function openQuickInput() {
+    var list = filteredList();
+    if (!list.length) list = Store.state.keywords.filter(function (k) { return k.active !== false; });
+    if (!list.length) { toast('먼저 지점과 키워드를 추가해 주세요.', 'error'); return; }
+    var rows = list.map(function (k) {
+      var b = Store.branchOf(k.branchId);
+      var rec = Store.record(k, UI.viewDate);
+      var val = rec && typeof rec.rank === 'number' ? rec.rank : '';
+      var out = rec && rec.rank === null;
+      return '<tr data-kw="' + k.id + '">' +
+        '<td class="qi-branch">' + Views.esc(b ? b.short : '') + '</td>' +
+        '<td class="qi-kw"><b>' + Views.esc(k.text) + '</b><span>' + (b ? Views.esc(b.short) + ' · ' : '') + '목표 ' + k.target + '위</span></td>' +
+        '<td class="qi-input"><input type="number" min="1" max="100" inputmode="numeric" value="' + val + '" placeholder="–" aria-label="' + Views.esc(k.text) + ' 순위"' + (out ? ' disabled' : '') + '></td>' +
+        '<td class="qi-out"><label class="check tiny"><input type="checkbox"' + (out ? ' checked' : '') + ' aria-label="' + Views.esc(k.text) + ' 권외">권외</label></td>' +
+        '</tr>';
+    }).join('');
+    openModal({
+      title: '순위 입력',
+      sub: Views.esc(Store.fmtDate(UI.viewDate)) + ' · ' + list.length + '개 키워드 (지금 필터 기준)',
+      wide: true,
+      body: '<div class="form-error" id="formError" hidden></div>' +
+        '<p class="form-hint">비워 두면 기록을 바꾸지 않습니다. 권외를 체크하면 100위 밖으로 기록됩니다.</p>' +
+        '<div class="qi-wrap"><table class="qi-table"><thead><tr><th>지점</th><th>키워드</th><th>순위</th><th>권외</th></tr></thead><tbody>' +
+        rows + '</tbody></table></div>',
+      foot: '<button class="btn ghost" data-close="1">취소</button><button class="btn primary" id="qiSave">일괄 저장</button>'
+    });
+
+    $$('.qi-table tbody tr').forEach(function (tr) {
+      var outBox = tr.querySelector('.qi-out input');
+      var input = tr.querySelector('.qi-input input');
+      outBox.addEventListener('change', function () { input.disabled = this.checked; if (this.checked) input.value = ''; });
+    });
+
+    $('#qiSave').addEventListener('click', function () {
+      var saved = 0;
+      $$('.qi-table tbody tr').forEach(function (tr) {
+        var id = tr.dataset.kw;
+        var out = tr.querySelector('.qi-out input').checked;
+        var input = tr.querySelector('.qi-input input');
+        var rec = Store.record(Store.keywordOf(id), UI.viewDate);
+        if (out) {
+          if (!(rec && rec.rank === null)) { Store.setRank(id, UI.viewDate, null, 'manual'); saved++; }
+          return;
+        }
+        var val = input.value.trim();
+        if (val === '') {
+          if (rec && rec.rank === null) { Store.clearRank(id, UI.viewDate); saved++; }
+          return;
+        }
+        var n = Number(val);
+        if (!isFinite(n) || n < 1) return;
+        if (!rec || rec.rank !== n) { Store.setRank(id, UI.viewDate, n, 'manual'); saved++; }
+      });
+      closeModal(); renderAll();
+      toast(saved ? saved + '개 키워드의 순위를 저장했습니다.' : '변경된 내용이 없습니다.');
+    });
+  }
+
+  /* ------------------------------------------------------------- branch ---- */
+  function openBranchModal(id) {
+    var b = id ? Store.branchOf(id) : null;
+    var brands = Store.state.brands.map(function (x) {
+      return '<option value="' + x.id + '"' + (b && b.brandId === x.id ? ' selected' : '') + '>' + Views.esc(x.name) + '</option>';
+    }).join('');
+    openModal({
+      title: b ? '지점 수정' : '새 지점 추가',
+      sub: b ? Views.esc(b.name) : '브랜드와 지점 정보를 등록합니다.',
+      body: '<div class="form-error" id="formError" hidden></div>' +
+        '<div class="form-grid two">' +
+        '<label class="field">브랜드<select id="bf_brand">' + brands + '</select></label>' +
+        '<label class="field">지점명<input id="bf_name" value="' + Views.esc(b ? b.name : '') + '" placeholder="예: 룸의정석 홍대점"></label>' +
+        '<label class="field">표시 이름<input id="bf_short" value="' + Views.esc(b ? b.short : '') + '" placeholder="예: 홍대점"></label>' +
+        '<label class="field">지역<input id="bf_area" value="' + Views.esc(b ? b.area : '') + '" placeholder="예: 서울 마포구 서교동"></label>' +
+        '<label class="field full">주소<input id="bf_address" value="' + Views.esc(b ? b.address : '') + '" placeholder="선택"></label>' +
+        '<label class="field">네이버 플레이스 ID<input id="bf_placeId" value="' + Views.esc(b ? b.placeId : '') + '" placeholder="예: 1085497413"></label>' +
+        '<label class="field">메모<input id="bf_memo" value="' + Views.esc(b ? b.memo : '') + '" placeholder="예: 금·토 21~24시 대기"></label>' +
+        '</div>' +
+        '<p class="form-hint">플레이스 ID를 넣으면 표에서 바로 플레이스 페이지로 연결됩니다. 없으면 네이버 검색으로 연결됩니다.</p>',
+      foot: '<button class="btn ghost" data-close="1">취소</button><button class="btn primary" id="bfSave">' + (b ? '저장' : '추가') + '</button>'
+    });
+    $('#bfSave').addEventListener('click', function () {
+      var data = {
+        brandId: $('#bf_brand').value, name: $('#bf_name').value, short: $('#bf_short').value,
+        area: $('#bf_area').value, address: $('#bf_address').value,
+        placeId: $('#bf_placeId').value, memo: $('#bf_memo').value
+      };
+      try {
+        if (b) Store.updateBranch(b.id, data); else Store.addBranch(data);
+        closeModal(); renderAll(); toast(b ? '지점을 수정했습니다.' : '지점을 추가했습니다.');
+      } catch (e) { fieldError(e.message); }
+    });
+  }
+
+  function openKeywordModal(id) {
+    var k = id ? Store.keywordOf(id) : null;
+    var branches = Store.state.branches.map(function (b) {
+      return '<option value="' + b.id + '"' + (k && k.branchId === b.id ? ' selected' : '') + '>' + Views.esc(b.name) + '</option>';
+    }).join('');
+    if (!Store.state.branches.length) { toast('먼저 지점을 추가해 주세요.', 'error'); openBranchModal(); return; }
+    openModal({
+      title: k ? '키워드 수정' : '키워드 추가',
+      sub: k ? Views.esc(k.text) : '추적할 네이버 플레이스 검색 키워드를 등록합니다.',
+      body: '<div class="form-error" id="formError" hidden></div>' +
+        '<div class="form-grid two">' +
+        '<label class="field">지점<select id="kf_branch">' + branches + '</select></label>' +
+        '<label class="field">키워드<input id="kf_text" value="' + Views.esc(k ? k.text : '') + '" placeholder="예: 홍대 헌팅포차"></label>' +
+        '<label class="field">목표 순위<input id="kf_target" type="number" min="1" max="100" value="' + (k ? k.target : 5) + '"></label>' +
+        '<label class="field">구분<select id="kf_priority"><option value="main"' + (k && k.priority === 'main' ? ' selected' : '') + '>메인</option><option value="sub"' + (!k || k.priority !== 'main' ? ' selected' : '') + '>서브</option></select></label>' +
+        '</div>' +
+        '<label class="check"><input type="checkbox" id="kf_active"' + (!k || k.active !== false ? ' checked' : '') + '> 순위 추적 사용</label>' +
+        '<p class="form-hint">지역명이 짧으면 다른 지역 매장이 섞여 나옵니다. ‘홍대 헌팅포차’처럼 지역 + 업종 형태를 권장합니다.</p>',
+      foot: '<button class="btn ghost" data-close="1">취소</button><button class="btn primary" id="kfSave">' + (k ? '저장' : '추가') + '</button>'
+    });
+    $('#kfSave').addEventListener('click', function () {
+      var data = {
+        branchId: $('#kf_branch').value, text: $('#kf_text').value,
+        target: Number($('#kf_target').value), priority: $('#kf_priority').value,
+        active: $('#kf_active').checked
+      };
+      try {
+        if (k) Store.updateKeyword(k.id, data); else Store.addKeyword(data);
+        closeModal(); renderAll(); toast(k ? '키워드를 수정했습니다.' : '키워드를 추가했습니다.');
+      } catch (e) { fieldError(e.message); }
+    });
+  }
+
+  function confirmDelete(kind, id) {
+    var label, detail;
+    if (kind === 'branch') {
+      var b = Store.branchOf(id);
+      var n = Store.keywordsOf(id).length;
+      label = b ? b.name : '지점';
+      detail = '이 지점의 키워드 ' + n + '개와 모든 순위 기록이 함께 삭제됩니다.';
+    } else {
+      var k = Store.keywordOf(id);
+      label = k ? k.text : '키워드';
+      detail = '이 키워드의 순위 기록이 모두 삭제됩니다.';
+    }
+    openModal({
+      title: '삭제할까요?',
+      sub: Views.esc(label),
+      body: '<p class="confirm-text">' + Views.esc(detail) + ' 되돌릴 수 없습니다.</p>' +
+        '<p class="form-hint">잠시 추적을 멈추려면 수정에서 ‘순위 추적 사용’을 끄면 됩니다.</p>',
+      foot: '<button class="btn ghost" data-close="1">취소</button><button class="btn danger" id="delOk">삭제</button>'
+    });
+    $('#delOk').addEventListener('click', function () {
+      if (kind === 'branch') Store.deleteBranch(id); else Store.deleteKeyword(id);
+      closeModal(); renderAll(); toast('삭제했습니다.');
+    });
+  }
+
+  /* -------------------------------------------------------------- import --- */
+  function openImportModal(mode) {
+    openModal({
+      title: mode === 'csv' ? 'CSV 가져오기' : 'JSON 가져오기',
+      sub: '자동 수집 스크립트가 만든 파일이나 백업 파일을 그대로 넣으세요.',
+      wide: true,
+      body: '<div class="form-error" id="formError" hidden></div>' +
+        '<label class="field file-field">파일 선택<input type="file" id="impFile" accept=".json,.csv,text/csv,application/json"></label>' +
+        '<label class="field">또는 내용 붙여넣기<textarea id="impText" rows="8" spellcheck="false" placeholder="' +
+        (mode === 'csv' ? '브랜드,지점,키워드,2026-11-25,2026-11-26' : '{ "kind": "place-rank-check", "date": "2026-11-26", "items": [ ... ] }') + '"></textarea></label>' +
+        '<label class="check"><input type="checkbox" id="impAuto" checked> 목록에 없는 지점·키워드는 자동 추가</label>' +
+        '<label class="check"><input type="checkbox" id="impRestore"> 전체 백업(JSON)으로 복원 — 기존 데이터를 교체합니다</label>' +
+        '<div id="impResult" class="imp-result" hidden></div>',
+      foot: '<button class="btn ghost" data-close="1">닫기</button><button class="btn primary" id="impApply">가져오기</button>'
+    });
+
+    $('#impFile').addEventListener('change', function () {
+      var file = this.files && this.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () { $('#impText').value = String(reader.result || ''); };
+      reader.readAsText(file, 'utf-8');
+    });
+
+    $('#impApply').addEventListener('click', function () {
+      var text = $('#impText').value.trim();
+      if (!text) { fieldError('파일을 선택하거나 내용을 붙여넣어 주세요.'); return; }
+      var isBackup = false;
+      try {
+        if (text[0] === '{') {
+          var probe = JSON.parse(text);
+          isBackup = !!(probe && (probe.kind === 'place-rank-dashboard' || (probe.branches && probe.keywords)));
+        }
+      } catch (e) { fieldError('JSON 형식이 올바르지 않습니다.'); return; }
+      if (isBackup && !$('#impRestore').checked) {
+        fieldError('전체 백업 파일입니다. “전체 백업으로 복원”을 체크해야 교체됩니다.');
+        return;
+      }
+      try {
+        var rep = Store.importData(text, { autoAdd: $('#impAuto').checked });
+        var box = $('#impResult');
+        box.hidden = false;
+        if (rep.mode === 'restore') {
+          box.className = 'imp-result ok';
+          box.innerHTML = '<b>백업을 복원했습니다.</b><br>지점 ' + rep.addedBranches + '개 · 키워드 ' + rep.addedKeywords + '개';
+        } else {
+          box.className = 'imp-result ok';
+          box.innerHTML = '<b>' + rep.updated + '건의 순위를 반영했습니다.</b>' +
+            (rep.addedBranches ? '<br>새 지점 ' + rep.addedBranches + '개' : '') +
+            (rep.addedKeywords ? ' · 새 키워드 ' + rep.addedKeywords + '개' : '') +
+            (rep.skipped ? '<br>건너뜀 ' + rep.skipped + '건' : '') +
+            (rep.errors.length ? '<ul class="imp-errors">' + rep.errors.slice(0, 5).map(function (x) { return '<li>' + Views.esc(x) + '</li>'; }).join('') + '</ul>' : '');
+        }
+        renderAll();
+        toast(rep.mode === 'restore' ? '백업을 복원했습니다.' : rep.updated + '건을 가져왔습니다.');
+      } catch (e) { fieldError(e.message); }
+    });
+  }
+
+  /* --------------------------------------------------------------- kakao --- */
+  function openKakaoModal() {
+    var brands = '<option value="all">전체 브랜드</option>' + Store.state.brands.map(function (b) {
+      return '<option value="' + b.id + '">' + Views.esc(b.name) + '</option>';
+    }).join('');
+    openModal({
+      title: '카톡 요약 문구',
+      sub: '클라이언트에게 그대로 붙여넣을 수 있는 텍스트입니다.',
+      wide: true,
+      body: '<div class="form-grid two compact">' +
+        '<label class="field">브랜드<select id="kkBrand">' + brands + '</select></label>' +
+        '<label class="field">지점<select id="kkBranch"><option value="all">전체 지점</option></select></label>' +
+        '</div>' +
+        '<label class="field">미리보기<textarea id="kkText" rows="14" readonly></textarea></label>',
+      foot: '<button class="btn ghost" data-close="1">닫기</button>' +
+        '<button class="btn primary" id="kkCopy">' + Views.ICON.copy + '복사</button>'
+    });
+
+    function fillBranches() {
+      var brand = $('#kkBrand').value;
+      $('#kkBranch').innerHTML = '<option value="all">전체 지점</option>' + Store.state.branches
+        .filter(function (b) { return brand === 'all' || b.brandId === brand; })
+        .map(function (b) { return '<option value="' + b.id + '">' + Views.esc(b.name) + '</option>'; }).join('');
+      update();
+    }
+    function update() {
+      $('#kkText').value = Store.kakaoText({
+        brand: $('#kkBrand').value, branch: $('#kkBranch').value, date: UI.viewDate
+      });
+    }
+    $('#kkBrand').addEventListener('change', fillBranches);
+    $('#kkBranch').addEventListener('change', update);
+    fillBranches();
+
+    $('#kkCopy').addEventListener('click', function () {
+      copyText($('#kkText').value).then(function (ok) {
+        if (ok) toast('카톡 요약을 복사했습니다. 붙여넣기만 하세요.');
+        else toast('복사에 실패했습니다. 문구를 직접 선택해 복사해 주세요.', 'error');
+      });
+    });
+  }
+
+  /* --------------------------------------------------------------- events --- */
+  function bind() {
+    document.addEventListener('click', function (e) {
+      var closer = e.target.closest ? e.target.closest('[data-close]') : null;
+      if (closer) { closeModal(); return; }
+      var backdrop = e.target.classList && e.target.classList.contains('modal-backdrop');
+      if (backdrop) { closeModal(); return; }
+
+      var el = e.target.closest ? e.target.closest('[data-act]') : null;
+      if (!el) return;
+      var act = el.dataset.act;
+      var id = el.dataset.id;
+
+      switch (act) {
+        case 'page': setPage(el.dataset.page); break;
+        case 'go-dashboard': if (e.preventDefault) e.preventDefault(); setPage('dashboard'); break;
+        case 'brand': UI.brand = id; UI.branch = 'all'; UI.hidden = {}; UI.focus = { type: 'all' }; renderDashboard(); break;
+        case 'reset-filter': UI.brand = 'all'; UI.branch = 'all'; UI.q = ''; UI.sort = 'default'; UI.focus = { type: 'all' }; renderDashboard(); break;
+        case 'range': UI.range = Number(id); renderDashboard(); break;
+        case 'toggle-series': UI.hidden[id] = !UI.hidden[id]; Views.renderChart(UI, UI.viewDate); break;
+        case 'focus-kw': UI.focus = { type: 'keyword', id: id }; Views.renderChart(UI, UI.viewDate); scrollToChart(); break;
+        case 'focus-branch': if (id) { UI.focus = { type: 'branch', id: id }; Views.renderChart(UI, UI.viewDate); scrollToChart(); } break;
+        case 'focus-all': UI.focus = { type: 'all' }; Views.renderChart(UI, UI.viewDate); break;
+        case 'day-prev': UI.viewDate = Store.addDays(UI.viewDate, -1); renderDashboard(); break;
+        case 'day-next':
+          if (UI.viewDate < Store.today()) { UI.viewDate = Store.addDays(UI.viewDate, 1); renderDashboard(); }
+          break;
+        case 'edit-rank': openRankModal(id); break;
+        case 'quick-input': openQuickInput(); break;
+        case 'add-branch': openBranchModal(); break;
+        case 'edit-branch': openBranchModal(id); break;
+        case 'del-branch': confirmDelete('branch', id); break;
+        case 'add-kw': openKeywordModal(); break;
+        case 'edit-kw': openKeywordModal(id); break;
+        case 'del-kw': confirmDelete('keyword', id); break;
+        case 'import-json': openImportModal('json'); break;
+        case 'import-csv': openImportModal('csv'); break;
+        case 'export-json': exportJSON(); break;
+        case 'export-csv': exportCSV('wide'); break;
+        case 'export-csv-long': exportCSV('long'); break;
+        case 'reset-demo': confirmReset(false); break;
+        case 'reset-blank': confirmReset(true); break;
+        case 'report': setPage('report'); break;
+        case 'print': printReport(); break;
+        case 'copy-kakao':
+          copyText(Store.kakaoText({ brand: UI.rBrand, branch: UI.rBranch, date: UI.rDate }))
+            .then(function (ok) {
+              if (ok) toast('카톡 요약을 복사했습니다. 붙여넣기만 하세요.');
+              else toast('복사에 실패했습니다. 문구 미리보기에서 직접 복사해 주세요.', 'error');
+            });
+          break;
+        case 'kakao-preview': openKakaoModal(); break;
+        default: break;
+      }
+      if (el.tagName === 'A' && el.getAttribute('href') === '#') e.preventDefault();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeModal(); return; }
+      if (e.key === 'Enter' || e.key === ' ') {
+        var t = e.target;
+        if (t && t.getAttribute && t.getAttribute('role') === 'button' && t.dataset.act) {
+          e.preventDefault();
+          t.click();
+        }
+      }
+    });
+
+    $('#branchSelect').addEventListener('change', function () {
+      UI.branch = this.value; UI.focus = { type: 'all' }; renderDashboard();
+    });
+    $('#sortSelect').addEventListener('change', function () {
+      UI.sort = this.value; renderDashboard();
+    });
+    var qTimer = null;
+    $('#searchInput').addEventListener('input', function () {
+      var v = this.value;
+      clearTimeout(qTimer);
+      qTimer = setTimeout(function () { UI.q = v; renderDashboard(); }, 160);
+    });
+
+    $('#rBrand').addEventListener('change', function () { UI.rBrand = this.value; UI.rBranch = 'all'; renderReport(); });
+    $('#rBranch').addEventListener('change', function () { UI.rBranch = this.value; renderReport(); });
+    $('#rTitle').addEventListener('input', function () { UI.rTitle = this.value; Views.reportDoc(UI, UI.rDate); });
+    $('#rDate').addEventListener('change', function () {
+      UI.rDate = this.value || Store.today();
+      Views.reportDoc(UI, UI.rDate);
+    });
+
+    var rTimer = null;
+    window.addEventListener('resize', function () {
+      clearTimeout(rTimer);
+      rTimer = setTimeout(function () {
+        if (UI.page === 'dashboard') Views.renderChart(UI, UI.viewDate);
+      }, 160);
+    });
+  }
+
+  function scrollToChart() {
+    if (window.innerWidth < 900) return;
+    var card = $('#chartCard');
+    var r = card.getBoundingClientRect();
+    if (r.top < 60 || r.bottom > window.innerHeight) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function exportCSV(mode) {
+    var text = Store.exportCSV(mode, filteredList());
+    var stamp = UI.viewDate.replace(/-/g, '');
+    var name = '플레이스순위_' + (mode === 'long' ? '일자별' : '지점별') + '_' + stamp + '.csv';
+    download(name, text, 'text/csv');
+    toast('CSV 파일을 내려받았습니다.');
+  }
+  function exportJSON() {
+    download('플레이스순위_백업_' + Store.today().replace(/-/g, '') + '.json', Store.exportJSON(), 'application/json');
+    toast('JSON 백업을 내려받았습니다.');
+  }
+
+  function confirmReset(blank) {
+    openModal({
+      title: blank ? '전체 데이터를 비울까요?' : '샘플 데이터로 되돌릴까요?',
+      sub: blank ? '지점·키워드·모든 순위 기록이 삭제됩니다.' : '지금 기록한 순위가 모두 샘플 값으로 바뀝니다.',
+      body: '<p class="confirm-text">이 작업은 되돌릴 수 없습니다. 필요하면 먼저 JSON 백업을 내려받아 주세요.</p>' +
+        '<p class="form-hint">내보내기: 지점·키워드 화면 → 데이터 가져오기·내보내기 → JSON 백업</p>',
+      foot: '<button class="btn ghost" data-close="1">취소</button>' +
+        '<button class="btn danger" id="resetOk">' + (blank ? '전체 비우기' : '샘플로 초기화') + '</button>'
+    });
+    $('#resetOk').addEventListener('click', function () {
+      Store.reset(!blank);
+      UI.focus = { type: 'all' }; UI.hidden = {};
+      UI.viewDate = Store.today(); UI.rDate = Store.today();
+      closeModal(); renderAll();
+      toast(blank ? '모든 데이터를 비웠습니다.' : '샘플 데이터로 되돌렸습니다.');
+    });
+  }
+
+  function printReport() {
+    if (UI.page !== 'report') setPage('report');
+    setTimeout(function () { window.print(); }, 260);
+  }
+
+  /* ----------------------------------------------------------------- init --- */
+  function init() {
+    Store.load();
+    bind();
+    if (location.hash && ['#dashboard', '#manage', '#report'].indexOf(location.hash) >= 0) {
+      UI.page = location.hash.slice(1);
+      $$('.page').forEach(function (p) { p.classList.add('hidden'); });
+      $('#page-' + UI.page).classList.remove('hidden');
+      $$('.tabs .tab').forEach(function (t) {
+        var on = t.dataset.page === UI.page;
+        t.classList.toggle('on', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    }
+    renderAll();
+  }
+
+  window.App = {
+    UI: UI,
+    renderAll: renderAll, renderDashboard: renderDashboard, renderReport: renderReport,
+    setPage: setPage, openQuickInput: openQuickInput, openRankModal: openRankModal,
+    openKakaoModal: openKakaoModal, openImportModal: openImportModal,
+    exportCSV: exportCSV, exportJSON: exportJSON, printReport: printReport,
+    copyText: copyText, toast: toast
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+</script>
+</body>
+</html>

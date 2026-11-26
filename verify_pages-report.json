@@ -1,0 +1,274 @@
+{
+  "home_canvas": {
+    "canvas": true,
+    "count": 2,
+    "w": 1440,
+    "h": 900,
+    "gl": true,
+    "three": true,
+    "gsap": true
+  },
+  "home_offline_fallback": null,
+  "home_offline": {
+    "canvas": true,
+    "gl": true,
+    "three": true,
+    "gsap": true,
+    "vendor": [
+      "http://127.0.0.1:8833/vendor/three.module.min.js",
+      "http://127.0.0.1:8833/vendor/gsap.min.js",
+      "http://127.0.0.1:8833/vendor/ScrollTrigger.min.js"
+    ],
+    "h1": "브랜드는\n혼자자라지\n않습니다."
+  },
+  "checks": [
+    {
+      "name": "HTTP 200 · /",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HTTP 200 · /rank/",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HTTP 200 · /index.html",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HTTP 200 · /vendor/three.module.min.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HTTP 200 · /vendor/three.min.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HTTP 200 · /vendor/gsap.min.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HTTP 200 · /vendor/ScrollTrigger.min.js",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "HTTP 200 · /.nojekyll",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "/rank (슬래시 없음) 리다이렉트",
+      "ok": true,
+      "detail": "HTTP 301"
+    },
+    {
+      "name": "홈 · title",
+      "ok": true,
+      "detail": "그로스코리아 | GROWTH KOREA — 브랜드의 성장을 설계하는 종합 광고·브랜딩 에이전시"
+    },
+    {
+      "name": "홈 · 히어로 헤딩",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈 · 히어로 문구",
+      "ok": true,
+      "detail": "브랜드는 혼자자라지 않습니다."
+    },
+    {
+      "name": "홈 · 체험단 링크 href",
+      "ok": true,
+      "detail": "https://hya910819.github.io/matetrip/"
+    },
+    {
+      "name": "홈 · 체험단 링크 target",
+      "ok": true,
+      "detail": "_blank"
+    },
+    {
+      "name": "홈 · 체험단 링크 rel noopener",
+      "ok": true,
+      "detail": "noopener"
+    },
+    {
+      "name": "홈 · 체험단 링크 클릭 → 이동 URL",
+      "ok": true,
+      "detail": "https://hya910819.github.io/matetrip/"
+    },
+    {
+      "name": "홈 · 섹션 #services",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈 · 섹션 #process",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈 · 섹션 #channels",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈 · 섹션 #about",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈 · 섹션 #top",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈 · 캔버스·WebGL 초기화",
+      "ok": true,
+      "detail": "{\"canvas\": true, \"count\": 2, \"w\": 1440, \"h\": 900, \"gl\": true, \"three\": true, \"gsap\": true}"
+    },
+    {
+      "name": "홈 · 가로 스크롤 없음(1440)",
+      "ok": true,
+      "detail": "scrollWidth=1440"
+    },
+    {
+      "name": "홈 · 가로 스크롤 없음(390)",
+      "ok": true,
+      "detail": "scrollWidth=390"
+    },
+    {
+      "name": "홈 · CDN 차단 시 로컬 vendor 폴백 로드",
+      "ok": true,
+      "detail": "['http://127.0.0.1:8833/vendor/three.module.min.js', 'http://127.0.0.1:8833/vendor/gsap.min.js', 'http://127.0.0.1:8833/vendor/ScrollTrigger.min.js']"
+    },
+    {
+      "name": "홈 · CDN 차단 시 3D 캔버스 유지",
+      "ok": true,
+      "detail": "{\"canvas\": true, \"gl\": true, \"three\": true, \"gsap\": true, \"vendor\": [\"http://127.0.0.1:8833/vendor/three.module.min.js\", \"http://127.0.0.1:8833/vendor/gsap.min.js\", \"http://127.0.0.1:8833/vendor/Scrol"
+    },
+    {
+      "name": "홈 · CDN 차단 시 히어로 텍스트 표시",
+      "ok": true,
+      "detail": "브랜드는\n혼자자라지\n않습니다."
+    },
+    {
+      "name": "랭크 · title",
+      "ok": true,
+      "detail": "지점별 플레이스 순위 관리 · 그로스코리아"
+    },
+    {
+      "name": "랭크 · KPI 렌더",
+      "ok": true,
+      "detail": "kpi 요소 31개"
+    },
+    {
+      "name": "랭크 · 순위표 행",
+      "ok": true,
+      "detail": "17행"
+    },
+    {
+      "name": "랭크 · 그로스코리아 표기",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "랭크 · 샘플 데이터 로드",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "랭크 · 외부 요청 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "랭크 · 가로 스크롤 없음(1440)",
+      "ok": true,
+      "detail": "scrollWidth=1440"
+    },
+    {
+      "name": "랭크 · 가로 스크롤 없음(390)",
+      "ok": true,
+      "detail": "scrollWidth=390"
+    },
+    {
+      "name": "랭크 · #report 라우팅",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "콘솔 오류 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "페이지 오류 0건",
+      "ok": true,
+      "detail": "[]"
+    },
+    {
+      "name": "로컬 실패 요청 0건",
+      "ok": true,
+      "detail": "[]"
+    }
+  ],
+  "passed": 39,
+  "total": 39,
+  "console_errors": [
+    {
+      "screen": "home-offline",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "screen": "home-offline",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "screen": "home-offline",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "screen": "home-offline",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "screen": "home-offline",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    }
+  ],
+  "page_errors": [],
+  "failed_local": [],
+  "failed_external": [
+    {
+      "screen": "home-offline",
+      "url": "https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Noto+Serif+KR:wght@300;400&display=swap",
+      "reason": "net::ERR_FAILED"
+    },
+    {
+      "screen": "home-offline",
+      "url": "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
+      "reason": "net::ERR_FAILED"
+    },
+    {
+      "screen": "home-offline",
+      "url": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+      "reason": "net::ERR_FAILED"
+    },
+    {
+      "screen": "home-offline",
+      "url": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js",
+      "reason": "net::ERR_FAILED"
+    },
+    {
+      "screen": "home-offline",
+      "url": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js",
+      "reason": "net::ERR_FAILED"
+    }
+  ]
+}
