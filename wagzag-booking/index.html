@@ -490,8 +490,8 @@ input,select,textarea{font:inherit;color:inherit}
     <div class="sync-inner">
       <span class="sync-dot" aria-hidden="true"></span>
       <span class="sync-text">
-        <b id="sync-label">로컬 모드</b>
-        <span id="sync-meta">이 기기에만 저장 · 시트 연동 대기</span>
+        <b id="sync-label">연동 대기 · 로컬 모드</b>
+        <span id="sync-meta">이 기기에만 저장 · 연동 설정에서 시트 연결</span>
       </span>
       <span class="sync-actions">
         <button type="button" class="sync-btn only-icon" id="btn-sync-refresh" hidden aria-label="구글 시트에서 새로고침" title="구글 시트에서 새로고침">
@@ -1414,8 +1414,8 @@ window.WZ_SEED = "ICA+AE5KEBcOFwtGVUwQTFVKU1FaGBNeWVhcG0VVTRJNVFYBEFlGUxoJXgtpSh
 
     var label = $('#sync-label'), meta = $('#sync-meta');
     if (st === 'local') {
-      label.textContent = '로컬 모드';
-      meta.textContent = '이 기기에만 저장 · 시트 연동 대기';
+      label.textContent = '연동 대기 · 로컬 모드';
+      meta.textContent = '이 기기에만 저장 · 연동 설정에서 시트 연결';
     } else if (st === 'syncing') {
       label.textContent = '동기화 중…';
       meta.textContent = SYNC.lastAt ? '마지막 동기화 ' + agoText(SYNC.lastAt) : '구글 시트에서 불러오는 중';
