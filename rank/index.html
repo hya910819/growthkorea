@@ -814,8 +814,8 @@ body.modal-open{overflow:hidden}
    그로스코리아 (GROWTH KOREA) — 지점별 네이버 플레이스 순위 대시보드
    data.js : 브랜드 / 지점 / 키워드 / 실측 순위 기록
    -------------------------------------------------------------------------
-   - 2026-11-26 네이버 모바일 플레이스 검색결과(광고 카드 제외) 실측값입니다.
-     측정 방법·근거는 data/measured-2026-11-26.md 참고.
+   - 2026-11-26 · 2026-11-27 네이버 모바일 플레이스 검색결과(광고 카드 제외) 실측값입니다.
+     측정 방법·근거는 data/measured-2026-11-26.md · data/measured-2026-11-27.md 참고.
    - 측정하지 않은 날짜는 기록을 넣지 않습니다(= 미확인).
      rank: null 은 '권외(100위 밖)'입니다.
    - 운영 시에는 이 파일 대신 JSON 가져오기로 매일 수집 데이터를 넣습니다.
@@ -823,7 +823,7 @@ body.modal-open{overflow:hidden}
 (function () {
   'use strict';
 
-  var MEASURED_AT = '2026-11-26';
+  var MEASURED_AT = '2026-11-27';
 
   var BRANDS = [
     { id: 'room',   name: '룸의정석',     color: '#7a2ff2', soft: '#f2ecff', ink: '#5a1fbe' },
@@ -853,32 +853,63 @@ body.modal-open{overflow:hidden}
      실제로 측정한 날짜만 넣습니다. */
   var KEYWORDS = [
     { id: 'k-hd-1', branchId: 'b-hongdae', text: '홍대 헌팅포차', target: 3, priority: 'main',
-      records: { '2026-11-26': { rank: 8, status: 'manual', at: '17:02' } } },
+      records: {
+        '2026-11-26': { rank: 8, status: 'manual', at: '17:02' },
+        '2026-11-27': { rank: 7, status: 'auto', at: '15:32' }
+      } },
     { id: 'k-hd-2', branchId: 'b-hongdae', text: '홍대 헌팅술집', target: 5, priority: 'main',
-      records: { '2026-11-26': { rank: 8, status: 'manual', at: '17:02' } } },
+      records: {
+        '2026-11-26': { rank: 8, status: 'manual', at: '17:02' },
+        '2026-11-27': { rank: 7, status: 'auto', at: '15:33' }
+      } },
     { id: 'k-hd-3', branchId: 'b-hongdae', text: '홍대 술집', target: 10, priority: 'sub',
-      records: { '2026-11-26': { rank: null, status: 'manual', at: '17:04' } } },
+      records: {
+        '2026-11-26': { rank: null, status: 'manual', at: '17:04' },
+        '2026-11-27': { rank: null, status: 'auto', at: '15:34' }
+      } },
     { id: 'k-gn-1', branchId: 'b-gangnam', text: '강남 헌팅포차', target: 5, priority: 'main',
-      records: { '2026-11-26': { rank: 8, status: 'manual', at: '17:06' } } },
+      records: {
+        '2026-11-26': { rank: 8, status: 'manual', at: '17:06' },
+        '2026-11-27': { rank: 8, status: 'auto', at: '15:34' }
+      } },
     { id: 'k-gn-2', branchId: 'b-gangnam', text: '강남역 술집', target: 10, priority: 'sub',
-      records: { '2026-11-26': { rank: 58, status: 'manual', at: '17:08' } } },
+      records: {
+        '2026-11-26': { rank: 58, status: 'manual', at: '17:08' },
+        '2026-11-27': { rank: 58, status: 'auto', at: '15:35' }
+      } },
     { id: 'k-mr-1', branchId: 'b-moran', text: '모란 헌팅포차', target: 5, priority: 'main',
-      records: { '2026-11-26': { rank: 1, status: 'manual', at: '17:09' } } },
+      records: {
+        '2026-11-26': { rank: 1, status: 'manual', at: '17:09' },
+        '2026-11-27': { rank: 1, status: 'auto', at: '15:35' }
+      } },
     { id: 'k-mr-2', branchId: 'b-moran', text: '모란역 술집', target: 10, priority: 'sub',
-      records: { '2026-11-26': { rank: 33, status: 'manual', at: '17:10' } } },
+      records: {
+        '2026-11-26': { rank: 33, status: 'manual', at: '17:10' },
+        '2026-11-27': { rank: 32, status: 'auto', at: '15:36' }
+      } },
     { id: 'k-wg-1', branchId: 'b-wagzag', text: '대구 교동 술집', target: 20, priority: 'main',
       records: {
         '2026-11-22': { rank: 28, status: 'manual', at: '17:58' },
         '2026-11-24': { rank: 31, status: 'manual', at: '15:11' },
         '2026-11-25': { rank: 31, status: 'manual', at: '15:00' },
-        '2026-11-26': { rank: 31, status: 'manual', at: '17:03' }
+        '2026-11-26': { rank: 31, status: 'manual', at: '17:03' },
+        '2026-11-27': { rank: 33, status: 'auto', at: '15:36' }
       } },
     { id: 'k-wg-2', branchId: 'b-wagzag', text: '동성로 술집', target: 20, priority: 'sub',
-      records: { '2026-11-26': { rank: null, status: 'manual', at: '17:03' } } },
+      records: {
+        '2026-11-26': { rank: null, status: 'manual', at: '17:03' },
+        '2026-11-27': { rank: null, status: 'auto', at: '15:37' }
+      } },
     { id: 'k-nd-1', branchId: 'b-nonda-ds', text: '대구 동성로 노래방', target: 10, priority: 'main',
-      records: { '2026-11-26': { rank: null, status: 'manual', at: '17:11' } } },
+      records: {
+        '2026-11-26': { rank: null, status: 'manual', at: '17:11' },
+        '2026-11-27': { rank: null, status: 'auto', at: '15:37' }
+      } },
     { id: 'k-nd-2', branchId: 'b-nonda-sm', text: '부산 서면 노래방', target: 10, priority: 'sub',
-      records: { '2026-11-26': { rank: null, status: 'manual', at: '17:12' } } }
+      records: {
+        '2026-11-26': { rank: null, status: 'manual', at: '17:12' },
+        '2026-11-27': { rank: null, status: 'auto', at: '15:37' }
+      } }
   ];
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -891,7 +922,8 @@ body.modal-open{overflow:hidden}
       settings: {
         targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false,
         source: 'naver-place-mobile',
-        measuredAt: MEASURED_AT
+        measuredAt: MEASURED_AT,
+        seedMergedAt: MEASURED_AT
       },
       brands: BRANDS.map(clone),
       branches: BRANCHES.map(clone),
@@ -972,7 +1004,7 @@ body.modal-open{overflow:hidden}
     if (!s || !s.branches || !s.keywords) return seed();
     s.brands = s.brands && s.brands.length ? s.brands : window.SEED.brands;
     s.version = 2;
-    s.settings = Object.assign({ targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false, source: 'naver-place-mobile' }, s.settings || {});
+    s.settings = Object.assign({ targetTop: 5, org: '그로스코리아', orgEn: 'GROWTH KOREA', demo: false, source: 'naver-place-mobile', seedMergedAt: '' }, s.settings || {});
     s.keywords.forEach(function (k) {
       k.records = k.records || {};
       k.target = Number(k.target) || 10;
@@ -1007,8 +1039,50 @@ body.modal-open{overflow:hidden}
       if (legacy) state = normalize(legacy);
     }
     if (!state) { state = seed(); save(); }
-    else save();
+    else { mergeSeed(); save(); }
     return state;
+  }
+
+  /* 매일 실측 기록(data.js SEED)을 브라우저에 저장된 데이터에 병합합니다.
+     - 사용자가 화면에서 직접 입력한 기록(status:'manual')은 덮어쓰지 않습니다.
+     - 사용자의 지점·키워드·기록을 지우지 않고, SEED에만 있는 새 날짜·지점·키워드만 더합니다.
+     - data.js 의 MEASURED_AT 이 바뀌면 한 번 실행됩니다(settings.seedMergedAt). */
+  function mergeSeed() {
+    var seedAt = window.SEED.measuredAt;
+    if (!seedAt || state.settings.seedMergedAt === seedAt) return false;
+    var seedData = window.SEED.build();
+    var changed = false;
+    seedData.branches.forEach(function (sb) {
+      var found = state.branches.filter(function (b) { return b.id === sb.id; })[0]
+        || state.branches.filter(function (b) { return b.name === sb.name; })[0];
+      if (!found) { state.branches.push(sb); changed = true; }
+      else if (!found.placeId && sb.placeId) { found.placeId = sb.placeId; changed = true; }
+    });
+    seedData.keywords.forEach(function (sk) {
+      var sb = seedData.branches.filter(function (b) { return b.id === sk.branchId; })[0] || {};
+      var branch = state.branches.filter(function (b) { return b.id === sk.branchId || b.name === sb.name; })[0];
+      if (!branch) return;
+      var kw = state.keywords.filter(function (k) { return k.id === sk.id; })[0]
+        || state.keywords.filter(function (k) { return k.branchId === branch.id && k.text === sk.text; })[0];
+      if (!kw) {
+        var copy = JSON.parse(JSON.stringify(sk));
+        copy.branchId = branch.id;
+        state.keywords.push(copy);
+        changed = true;
+        return;
+      }
+      Object.keys(sk.records || {}).forEach(function (date) {
+        var existing = kw.records[date];
+        var incoming = JSON.parse(JSON.stringify(sk.records[date]));
+        if (!existing) { kw.records[date] = incoming; changed = true; return; }
+        if (existing.status !== 'manual' && incoming.status !== 'manual' && existing.rank !== incoming.rank) {
+          kw.records[date] = incoming; changed = true;
+        }
+      });
+    });
+    if (seedAt > (state.settings.measuredAt || '')) state.settings.measuredAt = seedAt;
+    state.settings.seedMergedAt = seedAt;
+    return changed;
   }
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(state)); }
