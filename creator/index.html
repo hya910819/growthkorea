@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>크리에이터스 — 크리에이터와 브랜드를 잇는 모집 플랫폼 | 그로스코리아</title>
-<meta name="description" content="대구·부산 브랜드와 매장의 캠페인을 한눈에 보고 지원하세요. 채널 프로필과 바이오링크, 매칭 점수, 선정·단가 조율까지 한 화면에서. 크리에이터스 by GROWTH KOREA.">
+<meta name="description" id="metaDescription" content="대구·부산 브랜드와 매장의 캠페인을 한눈에 보고 지원하세요. 채널 프로필과 바이오링크, 매칭 점수, 선정·단가 조율까지 한 화면에서. 크리에이터스 by GROWTH KOREA.">
 <meta name="theme-color" content="#0A241E">
-<meta property="og:title" content="크리에이터스 — 크리에이터와 브랜드를 잇는 모집 플랫폼">
+<meta property="og:title" id="ogTitle" content="크리에이터스 — 크리에이터와 브랜드를 잇는 모집 플랫폼">
 <meta property="og:description" content="채널은 그대로, 섭외는 더 빠르게. 그로스코리아가 운영하는 크리에이터 모집 플랫폼.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A241E'/%3E%3Cpath d='M22.5 10.4a8 8 0 1 0 0 11.2' fill='none' stroke='%23C9F26B' stroke-width='3.4' stroke-linecap='round'/%3E%3Ccircle cx='24.6' cy='16' r='2.5' fill='%23F2542D'/%3E%3C/svg%3E">
@@ -619,6 +619,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .faq-q{width:100%;display:flex;align-items:center;gap:14px;text-align:left;padding:19px 2px;font-size:14px;font-weight:600;color:var(--forest);transition:color .2s}
 .faq-q:hover{color:var(--forest-3)}
 .faq-q .q{font-family:var(--font-mono);font-size:10px;color:var(--moss);flex:none}
+.faq-q .qtext{flex:1}
 .faq-q .ico{margin-left:auto;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:none;transition:transform .3s,background .3s}
 .faq-q .ico svg{width:9px;height:9px}
 .faq-q[aria-expanded="true"] .ico{transform:rotate(45deg);background:var(--lime);border-color:var(--lime)}
@@ -805,7 +806,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 32 32" fill="none"><path d="M24.4 9.6a9.4 9.4 0 1 0 0 12.8" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><circle cx="26.4" cy="16" r="2.9" fill="#F2542D"/></svg>
       </span>
-      <span class="brand-type"><b>CREATORS</b><i>BY GROWTH KOREA</i></span>
+      <span class="brand-type"><b data-plat-en>CREATORS</b><i data-plat-by>BY GROWTH KOREA</i></span>
     </a>
     <nav class="nav" id="primaryNav" aria-label="주요 메뉴">
       <button type="button" data-nav="campaigns">캠페인</button>
@@ -1043,7 +1044,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         </div>
         <div class="faq-list">
           <div class="faq-item">
-            <button type="button" class="faq-q" aria-expanded="false"><span class="q">Q1</span>크리에이터스는 무엇인가요?<span class="ico"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></button>
+            <button type="button" class="faq-q" aria-expanded="false"><span class="q">Q1</span><span class="qtext">어떤 플랫폼인가요?</span><span class="ico"><svg viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 1v8M1 5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span></button>
             <div class="faq-a">그로스코리아가 관리하는 브랜드·매장의 콘텐츠 캠페인과 크리에이터를 잇는 모집 플랫폼입니다. 크리에이터는 채널 프로필과 바이오링크를 만들고 캠페인에 지원하며, 매니저는 매칭 점수로 검토해 선정과 단가 조율을 진행합니다.</div>
           </div>
           <div class="faq-item">
@@ -1282,7 +1283,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div>
         <div class="share-card" id="shareCard"></div>
         <div class="share-foot">
-          <span>크리에이터스 by GROWTH KOREA에서 만든 프로필입니다.</span>
+          <span><b data-plat-ko>크리에이터스</b> by <b data-plat-by-en>GROWTH KOREA</b>에서 만든 프로필입니다.</span>
           <a href="#home" data-nav="home">캠페인 둘러보기 →</a>
         </div>
       </div>
@@ -1297,7 +1298,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="foot-brand">
         <a class="brand" href="#home" data-nav="home">
           <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M24.4 9.6a9.4 9.4 0 1 0 0 12.8" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><circle cx="26.4" cy="16" r="2.9" fill="#F2542D"/></svg></span>
-          <span class="brand-type"><b>CREATORS</b><i>BY GROWTH KOREA</i></span>
+          <span class="brand-type"><b data-plat-en>CREATORS</b><i data-plat-by>BY GROWTH KOREA</i></span>
         </a>
         <p>브랜드와 크리에이터가 조건을 확인하고, 매칭하고, 콘텐츠로 증명하는 모집 플랫폼. 그로스코리아가 운영합니다.</p>
       </div>
@@ -1330,7 +1331,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     </div>
     <p class="foot-note">이 페이지는 크리에이터 모집 플랫폼 1차 시연 버전입니다. 화면의 캠페인·지원자·매칭 점수는 예시 데이터이며, 입력한 내용은 서버로 전송되지 않고 이 브라우저에만 저장됩니다. 실제 운영 전에는 접수·정산·개인정보 처리 절차를 별도로 연결해야 합니다.</p>
     <div class="foot-bottom">
-      <span>© 2026 GROWTH KOREA. All rights reserved.</span>
+      <span>© 2026 <b data-plat-by-en>GROWTH KOREA</b>. All rights reserved.</span>
       <span>CREATORS — 크리에이터 모집 플랫폼 · v1.0</span>
     </div>
   </div>
@@ -1341,11 +1342,26 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <div class="sheet" id="sheet" hidden></div>
 
 <script>/* ============================================================
+   플랫폼 이름 상수 — 이름을 바꿀 때 이 파일만 고치고 build.py를 다시 실행하세요.
+   (헤더·푸터 워드마크, 브라우저 제목, 공유 화면 문구에 반영됩니다.
+    본문 카피에 직접 쓴 이름은 해당 문구를 함께 고쳐 주세요.)
+   ============================================================ */
+const GK_PLATFORM = {
+  nameKo: "크리에이터스",
+  nameEn: "CREATORS",
+  byKo: "그로스코리아",
+  byEn: "GROWTH KOREA",
+  tagline: "크리에이터와 브랜드를 잇는 모집 플랫폼",
+  description: "대구·부산 브랜드와 매장의 캠페인을 한눈에 보고 지원하세요. 채널 프로필과 바이오링크, 매칭 점수, 선정·단가 조율까지 한 화면에서. {name} by {by}."
+};
+
+
+/* ============================================================
    크리에이터스 — 시드 데이터 (전부 예시값)
    실제 고객 개인정보 없음. 매장·브랜드 이름만 실제 관리 브랜드 기준.
    ============================================================ */
 const GK_DATA = {
-  platform: { name: "크리에이터스", nameEn: "CREATORS", by: "GROWTH KOREA", version: "v1.0" },
+  platform: GK_PLATFORM,
   channels: {
     "인스타그램": { metric: "팔로워", short: "IG" },
     "유튜브": { metric: "구독자", short: "YT" },
@@ -2591,7 +2607,27 @@ const GK_DATA = {
     $$("#layoutToggle button").forEach(function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-layout") === (p.layout || "card") ? "true" : "false"); });
   }
 
+  function applyPlatform() {
+    var P = GK_PLATFORM;
+    var fullTitle = P.nameKo + " — " + P.tagline + " | " + P.byKo;
+    document.title = fullTitle;
+    var desc = P.description.replace("{name}", P.nameKo).replace("{by}", P.byEn);
+    var md = $("#metaDescription");
+    if (md) md.setAttribute("content", desc);
+    var og = $("#ogTitle");
+    if (og) og.setAttribute("content", P.nameKo + " — " + P.tagline);
+    $$("[data-plat-en]").forEach(function (el) { el.textContent = P.nameEn; });
+    $$("[data-plat-by]").forEach(function (el) { el.textContent = "BY " + P.byEn; });
+    $$("[data-plat-ko]").forEach(function (el) { el.textContent = P.nameKo; });
+    $$("[data-plat-by-en]").forEach(function (el) { el.textContent = P.byEn; });
+    var headBrand = $(".site-head .brand");
+    if (headBrand) headBrand.setAttribute("aria-label", P.nameKo + " 홈");
+    var footVer = $(".foot-bottom span:last-child");
+    if (footVer) footVer.textContent = P.nameEn + " — 크리에이터 모집 플랫폼 · v1.0";
+  }
+
   function boot() {
+    applyPlatform();
     fillBioForm(state.profile || D.profile);
     bindEvents();
     renderStats();
