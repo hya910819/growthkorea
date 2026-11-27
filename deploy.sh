@@ -25,14 +25,14 @@ fi
 
 if git remote get-url origin >/dev/null 2>&1; then git remote set-url origin "$REMOTE"; else git remote add origin "$REMOTE"; fi
 
-echo "== 2) 배포본 동기화 (홈페이지 · vendor · rank · 예약 보드)"
+echo "== 2) 배포본 동기화 (홈페이지 · vendor · rank · 예약 보드 · 크리에이터스)"
 bash "$DIR/sync.sh"
 
 echo "== 3) 커밋"
 git add -A
 if ! git diff --cached --quiet; then
   git -c user.name="이창희" -c user.email="${OWNER}@users.noreply.github.com" \
-      commit -q -m "그로스코리아 홈페이지 · 플레이스 순위 대시보드 · 와그자그 예약 보드 배포"
+      commit -q -m "그로스코리아 홈페이지 · 플레이스 순위 대시보드 · 와그자그 예약 보드 · 크리에이터스 배포"
   echo "변경분 커밋 완료"
 else
   echo "변경분 없음"
@@ -55,8 +55,9 @@ for i in $(seq 1 12); do
   code_root=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/" || true)
   code_rank=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/rank/" || true)
   code_book=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/wagzag-booking/" || true)
-  echo "   시도 $i · / → HTTP $code_root · /rank/ → HTTP $code_rank · /wagzag-booking/ → HTTP $code_book"
-  [ "$code_root" = "200" ] && [ "$code_rank" = "200" ] && [ "$code_book" = "200" ] && break
+  code_creator=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/creator/" || true)
+  echo "   시도 $i · / → HTTP $code_root · /rank/ → HTTP $code_rank · /wagzag-booking/ → HTTP $code_book · /creator/ → HTTP $code_creator"
+  [ "$code_root" = "200" ] && [ "$code_rank" = "200" ] && [ "$code_book" = "200" ] && [ "$code_creator" = "200" ] && break
 done
 gh api "/repos/${OWNER}/${REPO}/pages" --jq '{url: .html_url, status: .status, source: .source.branch}' 2>/dev/null || true
-echo "게시 주소: $SITE/  ·  $SITE/rank/  ·  $SITE/wagzag-booking/"
+echo "게시 주소: $SITE/  ·  $SITE/rank/  ·  $SITE/wagzag-booking/  ·  $SITE/creator/"

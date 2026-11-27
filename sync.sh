@@ -6,6 +6,8 @@
 #   work/groskorea-website/index.html                          → ./index.html
 #   work/groskorea-website/vendor/*                            → ./vendor/
 #   work/place-rank-dashboard/dist/place-rank-dashboard.html   → ./rank/index.html
+#   work/wagzag-booking/dist/wagzag-booking.html               → ./wagzag-booking/index.html
+#   work/creator-platform/dist/index.html                      → ./creator/index.html
 #
 # 홈페이지의 '체험단 사이트 보기' 링크는 로컬 MVP(../gross-experience-site/index.html) 대신
 # 배포된 메이트립 사이트(https://hya910819.github.io/matetrip/)를 열도록 바꿔 넣습니다.
@@ -47,7 +49,12 @@ python3 "$BOOK/build.py"
 mkdir -p "$DIR/wagzag-booking"
 cp "$BOOK/dist/wagzag-booking.html" "$DIR/wagzag-booking/index.html"
 
-echo "== 5) 점검"
+echo "== 5) 크리에이터스 플랫폼 빌드·복사"
+python3 "$DIR/../creator-platform/build.py"
+mkdir -p "$DIR/creator"
+cp "$DIR/../creator-platform/dist/index.html" "$DIR/creator/index.html"
+
+echo "== 6) 점검"
 grep -c "https://hya910819.github.io/matetrip/" "$DIR/index.html" | sed 's/^/   메이트립 링크 수: /'
 if grep -q "gross-experience-site" "$DIR/index.html"; then
   echo "   ✗ 로컬 MVP 링크가 남아 있습니다"; exit 1
@@ -57,4 +64,8 @@ for f in "$DIR/vendor/three.module.min.js" "$DIR/vendor/three.min.js" "$DIR/vend
 done
 [ -s "$DIR/rank/index.html" ] || { echo "   ✗ 누락: rank/index.html"; exit 1; }
 [ -s "$DIR/wagzag-booking/index.html" ] || { echo "   ✗ 누락: wagzag-booking/index.html"; exit 1; }
-echo "   완료 · index.html $(wc -c < "$DIR/index.html" | tr -d ' ') bytes · rank/index.html $(wc -c < "$DIR/rank/index.html" | tr -d ' ') bytes · wagzag-booking/index.html $(wc -c < "$DIR/wagzag-booking/index.html" | tr -d ' ') bytes"
+[ -s "$DIR/creator/index.html" ] || { echo "   ✗ 누락: creator/index.html"; exit 1; }
+if grep -qE "<script[^>]+src=|<link[^>]+rel=\"stylesheet\"" "$DIR/creator/index.html"; then
+  echo "   ✗ creator/index.html 에 외부 스크립트·스타일 참조가 있습니다"; exit 1
+fi
+echo "   완료 · index.html $(wc -c < "$DIR/index.html" | tr -d ' ') bytes · rank/index.html $(wc -c < "$DIR/rank/index.html" | tr -d ' ') bytes · wagzag-booking/index.html $(wc -c < "$DIR/wagzag-booking/index.html" | tr -d ' ') bytes · creator/index.html $(wc -c < "$DIR/creator/index.html" | tr -d ' ') bytes"
