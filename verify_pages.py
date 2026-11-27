@@ -7,7 +7,7 @@
   1) /            — 200, 홈페이지 렌더(히어로·섹션), 로컬 에셋(vendor/*) 200, 3D 캔버스 초기화
   2) /rank/       — 200, 대시보드 KPI·표 렌더, 외부 요청 0건(localStorage 저장)
   3) /rank        — 301/302 → /rank/ 로 이동
-  4) '체험단 사이트 보기' 링크 href == https://hya910819.github.io/matetrip/ , target=_blank rel=noopener
+  4) 홈페이지 v3 — 케이스 카드 4건, 메이트립/순위/크리에이터스 링크, 섹션 5개
   5) 콘솔 오류·페이지 오류·로컬 실패 요청 0건 (외부 CDN 실패는 따로 집계 — 로컬 폴백이 있으면 통과)
 결과: verify_pages-report.json / preview-*.png
 """
@@ -112,23 +112,12 @@ def main():
             hero_txt = page.locator("h1").first.inner_text().replace("\n", " ")
             check("홈 · 히어로 문구", "브랜드는" in hero_txt, hero_txt[:80])
 
-            link = page.locator('a:has-text("체험단 사이트 보기")').first
-            href = link.get_attribute("href")
-            tgt = link.get_attribute("target")
-            rel = link.get_attribute("rel") or ""
-            check("홈 · 체험단 링크 href", href == MATETRIP, href)
-            check("홈 · 체험단 링크 target", tgt == "_blank", tgt)
-            check("홈 · 체험단 링크 rel noopener", "noopener" in rel.split(), rel)
-
-            # 링크 클릭 시 실제 이동 대상 확인 (새 탭 주소만 검사)
-            with page.context.expect_page() as newpage_info:
-                link.click()
-            newpage = newpage_info.value
-            check("홈 · 체험단 링크 클릭 → 이동 URL", newpage.url.startswith(MATETRIP), newpage.url)
-            newpage.close()
+            check("홈 · 케이스 카드 4건", page.locator(".work").count() == 4, page.locator(".work").count())
+            check("홈 · 메이트립 링크", page.locator('a[href="' + MATETRIP + '"]').count() >= 1)
+            check("홈 · 순위 대시보드 링크", page.locator('a[href$="/growthkorea/rank/"]').count() >= 1)
 
             # 섹션·3D
-            for sel, nm in [("#services", "Services"), ("#process", "Process"), ("#channels", "Channels"), ("#about", "About"), ("#top", "Top")]:
+            for sel, nm in [("#identity", "Identity"), ("#work", "Work"), ("#capabilities", "Capabilities"), ("#process", "Process"), ("#contact", "Contact")]:
                 check(f"홈 · 섹션 {sel}", page.locator(sel).count() > 0)
             # 주의: 캔버스에 getContext('2d')를 호출하면 three.js의 WebGL 초기화가 깨진다.
             # 이미 만들어진 컨텍스트를 그대로 돌려받는 webgl2→webgl 순서로만 확인한다.
@@ -208,7 +197,7 @@ def main():
             rows = dpage.locator("table tbody tr").count()
             check("랭크 · 순위표 행", rows >= 10, f"{rows}행")
             check("랭크 · 그로스코리아 표기", "그로스코리아" in dpage.content())
-            check("랭크 · 샘플 데이터 로드", dpage.evaluate("!!localStorage.getItem('gk.placeRank.v1')"))
+            check("랭크 · 샘플 데이터 로드", dpage.evaluate("!!(localStorage.getItem('gk.placeRank.v2') || localStorage.getItem('gk.placeRank.v1'))"))
             ext = dpage.evaluate(
                 """() => performance.getEntriesByType('resource')
                     .filter(r => !r.name.startsWith(location.origin) && !r.name.startsWith('data:'))

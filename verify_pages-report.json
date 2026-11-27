@@ -1,9 +1,9 @@
 {
   "home_canvas": {
     "canvas": true,
-    "count": 2,
-    "w": 1440,
-    "h": 900,
+    "count": 1,
+    "w": 806,
+    "h": 686,
     "gl": true,
     "three": true,
     "gsap": true
@@ -15,11 +15,11 @@
     "three": true,
     "gsap": true,
     "vendor": [
-      "http://127.0.0.1:8833/vendor/three.module.min.js",
       "http://127.0.0.1:8833/vendor/gsap.min.js",
-      "http://127.0.0.1:8833/vendor/ScrollTrigger.min.js"
+      "http://127.0.0.1:8833/vendor/ScrollTrigger.min.js",
+      "http://127.0.0.1:8833/vendor/three.min.js"
     ],
-    "h1": "브랜드는\n혼자자라지\n않습니다."
+    "h1": "브랜드는\n혼자 자라지\n않습니다."
   },
   "checks": [
     {
@@ -70,7 +70,7 @@
     {
       "name": "홈 · title",
       "ok": true,
-      "detail": "그로스코리아 | GROWTH KOREA — 브랜드의 성장을 설계하는 종합 광고·브랜딩 에이전시"
+      "detail": "그로스코리아 GROWTH KOREA — 브랜드의 성장을 설계하는 종합 광고·브랜딩 에이전시"
     },
     {
       "name": "홈 · 히어로 헤딩",
@@ -80,30 +80,35 @@
     {
       "name": "홈 · 히어로 문구",
       "ok": true,
-      "detail": "브랜드는 혼자자라지 않습니다."
+      "detail": "브랜드는 혼자 자라지 않습니다."
     },
     {
-      "name": "홈 · 체험단 링크 href",
+      "name": "홈 · 케이스 카드 4건",
       "ok": true,
-      "detail": "https://hya910819.github.io/matetrip/"
+      "detail": "4"
     },
     {
-      "name": "홈 · 체험단 링크 target",
+      "name": "홈 · 메이트립 링크",
       "ok": true,
-      "detail": "_blank"
+      "detail": ""
     },
     {
-      "name": "홈 · 체험단 링크 rel noopener",
+      "name": "홈 · 순위 대시보드 링크",
       "ok": true,
-      "detail": "noopener"
+      "detail": ""
     },
     {
-      "name": "홈 · 체험단 링크 클릭 → 이동 URL",
+      "name": "홈 · 섹션 #identity",
       "ok": true,
-      "detail": "https://hya910819.github.io/matetrip/"
+      "detail": ""
     },
     {
-      "name": "홈 · 섹션 #services",
+      "name": "홈 · 섹션 #work",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈 · 섹션 #capabilities",
       "ok": true,
       "detail": ""
     },
@@ -113,24 +118,14 @@
       "detail": ""
     },
     {
-      "name": "홈 · 섹션 #channels",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "name": "홈 · 섹션 #about",
-      "ok": true,
-      "detail": ""
-    },
-    {
-      "name": "홈 · 섹션 #top",
+      "name": "홈 · 섹션 #contact",
       "ok": true,
       "detail": ""
     },
     {
       "name": "홈 · 캔버스·WebGL 초기화",
       "ok": true,
-      "detail": "{\"canvas\": true, \"count\": 2, \"w\": 1440, \"h\": 900, \"gl\": true, \"three\": true, \"gsap\": true}"
+      "detail": "{\"canvas\": true, \"count\": 1, \"w\": 806, \"h\": 686, \"gl\": true, \"three\": true, \"gsap\": true}"
     },
     {
       "name": "홈 · 가로 스크롤 없음(1440)",
@@ -145,17 +140,17 @@
     {
       "name": "홈 · CDN 차단 시 로컬 vendor 폴백 로드",
       "ok": true,
-      "detail": "['http://127.0.0.1:8833/vendor/three.module.min.js', 'http://127.0.0.1:8833/vendor/gsap.min.js', 'http://127.0.0.1:8833/vendor/ScrollTrigger.min.js']"
+      "detail": "['http://127.0.0.1:8833/vendor/gsap.min.js', 'http://127.0.0.1:8833/vendor/ScrollTrigger.min.js', 'http://127.0.0.1:8833/vendor/three.min.js']"
     },
     {
       "name": "홈 · CDN 차단 시 3D 캔버스 유지",
       "ok": true,
-      "detail": "{\"canvas\": true, \"gl\": true, \"three\": true, \"gsap\": true, \"vendor\": [\"http://127.0.0.1:8833/vendor/three.module.min.js\", \"http://127.0.0.1:8833/vendor/gsap.min.js\", \"http://127.0.0.1:8833/vendor/Scrol"
+      "detail": "{\"canvas\": true, \"gl\": true, \"three\": true, \"gsap\": true, \"vendor\": [\"http://127.0.0.1:8833/vendor/gsap.min.js\", \"http://127.0.0.1:8833/vendor/ScrollTrigger.min.js\", \"http://127.0.0.1:8833/vendor/thre"
     },
     {
       "name": "홈 · CDN 차단 시 히어로 텍스트 표시",
       "ok": true,
-      "detail": "브랜드는\n혼자자라지\n않습니다."
+      "detail": "브랜드는\n혼자 자라지\n않습니다."
     },
     {
       "name": "랭크 · title",
@@ -218,21 +213,9 @@
       "detail": "[]"
     }
   ],
-  "passed": 39,
-  "total": 39,
+  "passed": 38,
+  "total": 38,
   "console_errors": [
-    {
-      "screen": "home-offline",
-      "text": "Failed to load resource: net::ERR_FAILED"
-    },
-    {
-      "screen": "home-offline",
-      "text": "Failed to load resource: net::ERR_FAILED"
-    },
-    {
-      "screen": "home-offline",
-      "text": "Failed to load resource: net::ERR_FAILED"
-    },
     {
       "screen": "home-offline",
       "text": "Failed to load resource: net::ERR_FAILED"
@@ -247,27 +230,12 @@
   "failed_external": [
     {
       "screen": "home-offline",
-      "url": "https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Noto+Serif+KR:wght@300;400&display=swap",
+      "url": "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap",
       "reason": "net::ERR_FAILED"
     },
     {
       "screen": "home-offline",
       "url": "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css",
-      "reason": "net::ERR_FAILED"
-    },
-    {
-      "screen": "home-offline",
-      "url": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
-      "reason": "net::ERR_FAILED"
-    },
-    {
-      "screen": "home-offline",
-      "url": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js",
-      "reason": "net::ERR_FAILED"
-    },
-    {
-      "screen": "home-offline",
-      "url": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js",
       "reason": "net::ERR_FAILED"
     }
   ],

@@ -4,7 +4,7 @@
 
 | 주소 | 페이지 | 원본 |
 |---|---|---|
-| `https://hya910819.github.io/growthkorea/` | 회사 홈페이지 v2 (3D·모션그래픽) | `work/groskorea-website/index.html` |
+| `https://hya910819.github.io/growthkorea/` | 회사 홈페이지 v3 (하이엔드 · 케이스 스터디) | `work/groskorea-website/index.html` |
 | `https://hya910819.github.io/growthkorea/rank/` | 지점별 네이버 플레이스 순위 관리 대시보드 | `work/place-rank-dashboard/dist/place-rank-dashboard.html` |
 | `https://hya910819.github.io/growthkorea/wagzag-booking/` | 와그자그 교동점 직원용 예약 보드 (PIN 잠금) | `work/wagzag-booking/dist/wagzag-booking.html` |
 | `https://hya910819.github.io/growthkorea/creator/` | 크리에이터스 — 크리에이터 모집 플랫폼 (1차 시연) | `work/creator-platform/dist/index.html` |
@@ -15,7 +15,8 @@
 
 ```
 growthkorea-pages/
-├─ index.html          홈페이지 (문서 1개 + vendor 폴백). '체험단 사이트 보기' → https://hya910819.github.io/matetrip/
+├─ index.html          홈페이지 v3 (문서 1개 · Three.js 3D + GSAP + 케이스 모달)
+├─ assets/             케이스 스터디 이미지 4종 (work-*.webp, 1200×800)
 ├─ vendor/             CDN이 막힌 환경을 위한 로컬 폴백 (three · gsap · ScrollTrigger)
 ├─ rank/index.html     순위 대시보드 단일 파일 (CSS·JS 인라인, 외부 요청 0건)
 ├─ wagzag-booking/index.html  와그자그 예약 보드 단일 파일 (예약 데이터는 PIN 기반 암호문)
@@ -23,8 +24,8 @@ growthkorea-pages/
 ├─ .nojekyll           GitHub Pages의 Jekyll 처리 생략
 ├─ sync.sh             원본 → 배포본 동기화 (커밋·푸시 없음)
 ├─ deploy.sh           sync → 커밋 → main·gh-pages 푸시 → 접속 확인
-├─ verify_pages.py     실제 Chromium 로컬 검증 (39개 항목)
-├─ verify_live.py      라이브 URL 검증 (1440×900 · 390×844, 52개 항목)
+├─ verify_pages.py     배포본 로컬 검증 (38개 항목 — 홈 v3 · rank · 폴백)
+├─ verify_live.py      라이브 URL 검증 (1440×900 · 390×844, 31개 항목)
 ├─ capture_mobile.py   모바일 섹션 캡처 · 인터랙션(드로어·모달·탭) 확인
 ├─ capture_desktop.py  데스크톱 섹션·표 레이아웃 캡처
 ├─ anchor_test.py      앵커 이동 시 고정 헤더 가림 확인
@@ -56,44 +57,42 @@ GitHub Pages 게시 소스는 **`gh-pages` 브랜치 `/` (root)** 입니다. Pic
 
 ## 수정 후 반영
 
-- 홈페이지 문구·디자인: `work/groskorea-website/index.html` 을 고친 뒤 `deploy.sh`
-  (`sync.sh` 가 `../gross-experience-site/index.html` 링크를 메이트립 주소로 바꿔 넣으므로, 배포본을 직접 고치지 마세요)
+- 홈페이지 문구·디자인: `work/groskorea-website/src/` 를 고치고 `python3 build.py` → `deploy.sh`
+  (`sync.sh` 가 `index.html`·`assets/`·`vendor/` 를 복사합니다. 배포본을 직접 고치지 마세요)
 - 순위 대시보드: `work/place-rank-dashboard/assets/*` 를 고치고 `deploy.sh`
   (`sync.sh` 안에서 `build.py` 가 단일 파일을 다시 만듭니다)
 
 ## 검증
 
 ```bash
-cd work/growthkorea-pages
-LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 verify_pages.py
+cd work/groskorea-website
+LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 verify.py
 ```
 
-로컬 서버(`127.0.0.1:8833`)를 띄워 실제 Chromium으로 확인합니다. 최근 결과 **39/39 통과**.
+홈페이지 원본(`work/groskorea-website/`)을 로컬 서버로 띄워 실제 Chromium으로 확인합니다. **48/48 통과** (2026-11-28).
+콘솔 오류 0 · 이미지 4종 로드 · 360~1920px 가로 스크롤 0 · 커서가 버튼 글자를 가리지 않음 · 필터·모달·아코디언·앵커·폼 · no-JS · 모션 최소화 · CDN 차단 폴백까지 포함합니다.
 
 ```bash
-LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 verify_live.py
+cd work/growthkorea-pages
+LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 verify_pages.py   # 배포본 로컬 · 38/38
+LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 verify_live.py    # 라이브 · 31/31
 ```
 
-배포된 라이브 주소를 데스크톱 1440×900 · 모바일 390×844에서 직접 열어 확인합니다. 최근 결과 **52/52 통과** (2026-11-26, 커밋 `af5d554`).
+`verify_live.py`가 라이브에서 직접 확인하는 것 (2026-11-28 배포분)
 
-- 홈 · 순위 대시보드 · 메이트립 모두 HTTP 200 · 가로 스크롤 없음(`scrollWidth == innerWidth`) · 뷰포트 밖으로 삐져나온 요소 0건
-- 버튼/링크: `체험단 사이트 보기` 클릭 → `https://hya910819.github.io/matetrip/` 새 탭 이동(PC·모바일 모두) · nav 앵커 이동 · 모바일 드로어 · 서비스 아코디언 · `순위 입력` 모달 · `지점·키워드`/`리포트` 탭
-- 앵커 이동 시 섹션 제목이 고정 헤더에 가리지 않음(데스크톱 208px / 모바일 144px 아래에서 시작)
-- 콘솔 오류 0 · 페이지 오류 0 · 실패 요청 0
-- 본문 텍스트는 `preview-live/text/*.txt`로 덤프해 오탈자를 직접 검수(2026-11-26 `타기팅` → `타겟팅` 1건 수정)
-
-- `/` 200 · 히어로·섹션 5개·3D 캔버스(WebGL) 초기화 · 로컬 에셋 4개 200 · 가로 스크롤 없음(1440·390)
-- `체험단 사이트 보기` → `https://hya910819.github.io/matetrip/` (`target="_blank" rel="noopener"`), 클릭 시 실제 이동 확인
-- CDN(jsdelivr·Google Fonts)을 차단해도 `vendor/` 폴백으로 3D가 살아 있는지 확인
-- `/rank/` 200 · KPI·순위표 렌더 · 외부 요청 0건 · `#report` 라우팅 · 가로 스크롤 없음(1440·390)
-- `/rank`(슬래시 없음) → 301 로 `/rank/` 이동
-- 콘솔 오류 0 · 페이지 오류 0 · 로컬 실패 요청 0
+- 홈 · `/rank/` · `/creator/` · `/wagzag-booking/` · 메이트립 모두 HTTP 200, `assets/*.webp` · `vendor/*.js` 200
+- 데스크톱 1440×900 · 모바일 390×844 가로 스크롤 0, 콘솔 오류 0, 페이지 오류 0, 실패 요청 0
+- WebGL 초기화 · GSAP/ScrollTrigger 로드 · 케이스 카드 4건 · 필터(테크 2건) · 모달 열기/ESC 닫기(4단계)
+- 앵커 이동 시 섹션 제목이 고정 헤더에 가리지 않음(78px) · 모바일 드로어 · 모바일 모달 전체 폭
+- 폼 필수 3항목 검증 · `GROSS` 표기 0건
+- 스크린샷: `preview-live/*.png`, `../groskorea-website/preview/pc-home-v3.png` · `pc-work-v3.png` · `mobile-home-v3.png`
 
 ## 알아둘 점
 
 - 저장소가 Public이면 `/rank/` 도 **주소를 아는 사람은 누구나** 열 수 있습니다(로그인 없음). 고객사·매장명이 화면에 보이므로 링크는 내부에만 공유하세요.
 - 대시보드 기록은 서버가 아니라 **각자 브라우저의 `localStorage`(`gk.placeRank.v1`)** 에 저장됩니다. PC를 바꾸면 `JSON 백업`으로 옮겨야 하고, 팀원끼리 같은 데이터를 보려면 백업 파일을 주고받아야 합니다.
 - 홈페이지 상담 폼은 서버 전송 없이 화면에서 문구를 만들고 카카오톡으로 넘기는 방식입니다. 그래서 정적 페이지만으로 동작합니다.
+- 홈페이지 케이스 스터디 이미지는 분위기 연출용으로 만든 이미지입니다(실제 매장 사진 아님). 모달 하단에 그 문구를 표시합니다.
 
 ## 예약 보드 (`/wagzag-booking/`) — 개인정보 보호
 

@@ -1,0 +1,177 @@
+{
+  "at": "2026-11-28 01:11:10",
+  "total": 31,
+  "passed": 31,
+  "failed": [],
+  "checks": [
+    {
+      "name": "HTTP 200 · home",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "HTTP 200 · rank",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "HTTP 200 · creator",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "HTTP 200 · wagzag-booking",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "HTTP 200 · matetrip",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "HTTP 200 · assets/work-bar.webp",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "HTTP 200 · assets/work-tech.webp",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "HTTP 200 · vendor/three.min.js",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "HTTP 200 · vendor/gsap.min.js",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "홈: 콘솔 오류 0",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "홈: 페이지 오류 0",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "홈: 실패 요청 0",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "홈: 가로 스크롤 없음",
+      "ok": true,
+      "detail": "1440/1440"
+    },
+    {
+      "name": "홈: 이미지 로드",
+      "ok": true,
+      "detail": [
+        {
+          "src": "work-bar.webp",
+          "w": 1200
+        },
+        {
+          "src": "work-data.webp",
+          "w": 1200
+        }
+      ]
+    },
+    {
+      "name": "홈: WebGL · GSAP",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈: H1",
+      "ok": true,
+      "detail": "브랜드는 / 혼자 자라지 / 않습니다."
+    },
+    {
+      "name": "홈: 케이스 4건",
+      "ok": true,
+      "detail": 4
+    },
+    {
+      "name": "홈: GROSS 표기 0",
+      "ok": true,
+      "detail": 0
+    },
+    {
+      "name": "홈: 필터(퍼포먼스·테크) 2건",
+      "ok": true,
+      "detail": 2
+    },
+    {
+      "name": "홈: 케이스 모달 열림",
+      "ok": true,
+      "detail": {
+        "hidden": false,
+        "title": "와그자그 교동점",
+        "steps": 4,
+        "links": 2
+      }
+    },
+    {
+      "name": "홈: 모달 4단계",
+      "ok": true,
+      "detail": 4
+    },
+    {
+      "name": "홈: 모달 ESC 닫힘",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "홈: 앵커 이동(헤더에 가리지 않음)",
+      "ok": true,
+      "detail": 78
+    },
+    {
+      "name": "홈: 폼 필수 검증",
+      "ok": true,
+      "detail": 3
+    },
+    {
+      "name": "모바일: 가로 스크롤 없음",
+      "ok": true,
+      "detail": "390/390"
+    },
+    {
+      "name": "모바일: 콘솔 오류 0",
+      "ok": true,
+      "detail": []
+    },
+    {
+      "name": "모바일: 드로어",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "모바일: 모달",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "rank: 스크롤·오류 없음",
+      "ok": true,
+      "detail": "1440/1440 · []"
+    },
+    {
+      "name": "creator: 스크롤·오류 없음",
+      "ok": true,
+      "detail": "1440/1440 · []"
+    },
+    {
+      "name": "wagzag-booking: 스크롤·오류 없음",
+      "ok": true,
+      "detail": "1440/1440 · []"
+    }
+  ]
+}

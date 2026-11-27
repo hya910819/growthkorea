@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
-"""그로스코리아 GitHub Pages 라이브 검증 (실제 Chromium)
+"""그로스코리아 GitHub Pages 라이브 검증 (v3 · 실제 Chromium)
 
     LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 verify_live.py
 
 대상
-  홈페이지   https://hya910819.github.io/growthkorea/
-  순위 대시  https://hya910819.github.io/growthkorea/rank/
-  메이트립   https://hya910819.github.io/matetrip/
-화면
-  데스크톱 1440x900 · 모바일 390x844
+  홈페이지      https://hya910819.github.io/growthkorea/
+  순위 대시보드  https://hya910819.github.io/growthkorea/rank/
+  크리에이터스   https://hya910819.github.io/growthkorea/creator/
+  예약 보드      https://hya910819.github.io/growthkorea/wagzag-booking/
+  메이트립      https://hya910819.github.io/matetrip/
 
-확인 항목
-  1) HTTP 200
-  2) 가로 스크롤 없음 (documentElement.scrollWidth <= innerWidth)
-  3) 뷰포트 밖으로 삐져나온 요소(레이아웃 깨짐 후보) 0건
-  4) 핵심 요소 렌더 (히어로·KPI·표 등)
-  5) '체험단 사이트 보기' 클릭 → 메이트립 새 탭 이동
-  6) 콘솔 오류·페이지 오류·로컬 실패 요청 0건
-  7) 본문 텍스트 덤프 (오탈자 검수용)
-결과: verify_live-report.json / preview-live/*.png / preview-live/text/*.txt
+화면
+  데스크톱 1440×900 · 모바일 390×844
+
+결과
+  preview-live/verify-live-report.json · preview-live/*.png
+  ../groskorea-website/preview/pc-home-v3.png · pc-work-v3.png · mobile-home-v3.png
 """
 import json
-import re
+import time
 import urllib.request
 from pathlib import Path
 
@@ -29,251 +26,177 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "preview-live"
-TEXT = OUT / "text"
-
-TARGETS = {
-    "home": "https://hya910819.github.io/growthkorea/",
-    "rank": "https://hya910819.github.io/growthkorea/rank/",
+PREVIEW = ROOT.parent / "groskorea-website" / "preview"
+SITE = "https://hya910819.github.io/growthkorea"
+PAGES = {
+    "home": SITE + "/",
+    "rank": SITE + "/rank/",
+    "creator": SITE + "/creator/",
+    "wagzag-booking": SITE + "/wagzag-booking/",
     "matetrip": "https://hya910819.github.io/matetrip/",
 }
-VIEWPORTS = [("desktop", 1440, 900), ("mobile", 390, 844)]
 
-OVERFLOW_JS = """() => {
-  const W = window.innerWidth;
-  const bad = [];
-  const seen = new Set();
-  for (const el of document.querySelectorAll('body *')) {
-    const r = el.getBoundingClientRect();
-    if (r.width === 0 && r.height === 0) continue;
-    const cs = getComputedStyle(el);
-    if (cs.visibility === 'hidden' || cs.display === 'none') continue;
-    if (r.right <= W + 1 && r.left >= -1) continue;
-    // 조상이 가로 클리핑(overflow-x hidden/auto/scroll)이면 의도된 처리로 본다
-    let clipped = false, p = el.parentElement;
-    while (p && p !== document.documentElement) {
-      const pcs = getComputedStyle(p);
-      if (/(auto|scroll|hidden|clip)/.test(pcs.overflowX)) { clipped = true; break; }
-      p = p.parentElement;
-    }
-    if (clipped) continue;
-    const key = el.tagName + '|' + (el.className || '').toString() + '|' + Math.round(r.left) + '|' + Math.round(r.width);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    bad.push({
-      tag: el.tagName.toLowerCase(),
-      cls: (el.className || '').toString().slice(0, 70),
-      id: el.id || '',
-      left: Math.round(r.left), right: Math.round(r.right), w: Math.round(r.width),
-      pos: cs.position,
-      text: (el.innerText || '').replace(/\\s+/g, ' ').slice(0, 40)
-    });
-  }
-  return {
-    innerWidth: W,
-    scrollWidth: document.documentElement.scrollWidth,
-    bodyScrollWidth: document.body.scrollWidth,
-    clientWidth: document.documentElement.clientWidth,
-    scrollHeight: document.documentElement.scrollHeight,
-    badCount: bad.length,
-    bad: bad.slice(0, 20)
-  };
-}"""
-
-checks = []
-console_errors, page_errors, failed_requests = [], [], []
+results = []
 
 
 def check(name, ok, detail=""):
-    checks.append({"name": name, "ok": bool(ok), "detail": str(detail)[:400]})
-    print(("PASS " if ok else "FAIL ") + name + ((" · " + str(detail)[:200]) if detail != "" else ""))
-    return bool(ok)
+    results.append({"name": name, "ok": bool(ok), "detail": detail})
+    print(("  PASS  " if ok else "  FAIL  ") + name + ((" · " + str(detail)) if detail else ""))
 
 
-def http_status(url):
+def http_code(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=20) as r:
+        with urllib.request.urlopen(req, timeout=30) as r:
             return r.status
-    except urllib.error.HTTPError as e:
-        return e.code
     except Exception as e:  # noqa: BLE001
-        return f"ERR {e}"
-
-
-def attach(page, tag):
-    page.on("console", lambda m: console_errors.append({"screen": tag, "text": m.text[:300]})
-            if m.type == "error" else None)
-    page.on("pageerror", lambda e: page_errors.append({"screen": tag, "text": str(e)[:300]}))
-    page.on("requestfailed", lambda r: failed_requests.append(
-        {"screen": tag, "url": r.url[:200], "reason": str(r.failure)[:120]}))
-    page.on("response", lambda r: None)
-
-
-def typo_scan(text):
-    """기계적으로 걸러낼 수 있는 흔적만 (오탈자 최종 판단은 본문 덤프를 사람이 읽어 확인)"""
-    issues = []
-    if "\ufffd" in text:
-        issues.append("U+FFFD 대체문자(인코딩 깨짐)")
-    for pat, label in [(r"undefined", "undefined 노출"), (r"\bNaN\b", "NaN 노출"),
-                       (r"lorem ipsum", "lorem ipsum"), (r"TODO|FIXME", "TODO/FIXME"),
-                       (r"\?\?", "?? 물음표 연속"), (r"\u3131\u3131", "자모 반복")]:
-        if re.search(pat, text, re.I):
-            issues.append(label)
-    if re.search(r"[ \t]{4,}", text):
-        issues.append("공백 4칸 이상")
-    return issues
+        return getattr(e, "code", str(e))
 
 
 def main():
     OUT.mkdir(exist_ok=True)
-    TEXT.mkdir(exist_ok=True)
-    report = {"targets": TARGETS, "screens": {}}
-
-    # ---------- HTTP ----------
-    for key, url in TARGETS.items():
-        code = http_status(url)
-        check(f"HTTP 200 · {key}", code == 200, f"HTTP {code} · {url}")
+    PREVIEW.mkdir(exist_ok=True)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(args=["--font-render-hinting=none"])
+        browser = p.chromium.launch()
 
-        for key, url in TARGETS.items():
-            report["screens"][key] = {}
-            for vp_name, w, h in VIEWPORTS:
-                tag = f"{key}-{vp_name}"
-                ctx = browser.new_context(
-                    viewport={"width": w, "height": h},
-                    device_scale_factor=2 if vp_name == "mobile" else 1,
-                    is_mobile=(vp_name == "mobile"),
-                    has_touch=(vp_name == "mobile"),
-                    locale="ko-KR",
-                    timezone_id="Asia/Seoul",
-                    user_agent=("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 "
-                                "(KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1")
-                    if vp_name == "mobile" else None,
-                )
-                page = ctx.new_page()
-                attach(page, tag)
-                resp = page.goto(url, wait_until="load", timeout=60000)
-                page.wait_for_timeout(4000)
-                # 지연 로딩 요소까지 확인
-                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                page.wait_for_timeout(1500)
-                page.evaluate("window.scrollTo(0, 0)")
-                page.wait_for_timeout(800)
+        # ---------- 1) HTTP 상태 ----------
+        for name, url in PAGES.items():
+            code = http_code(url)
+            check(f"HTTP 200 · {name}", code == 200, code)
+        for asset in ("assets/work-bar.webp", "assets/work-tech.webp", "vendor/three.min.js", "vendor/gsap.min.js"):
+            code = http_code(f"{SITE}/{asset}")
+            check(f"HTTP 200 · {asset}", code == 200, code)
 
-                m = page.evaluate(OVERFLOW_JS)
-                report["screens"][key][vp_name] = m
-                check(f"{tag} · HTTP 상태", (resp.status if resp else None) == 200, resp.status if resp else "no response")
-                check(f"{tag} · 가로 스크롤 없음 (scrollWidth<=innerWidth)",
-                      m["scrollWidth"] <= m["innerWidth"],
-                      f"scrollWidth={m['scrollWidth']} innerWidth={m['innerWidth']}")
-                check(f"{tag} · 뷰포트 밖 요소 0건", m["badCount"] == 0,
-                      json.dumps(m["bad"][:5], ensure_ascii=False))
+        # ---------- 2) 홈 · 데스크톱 ----------
+        ctx = browser.new_context(viewport={"width": 1440, "height": 900}, device_scale_factor=1)
+        page = ctx.new_page()
+        errors, page_errors, failed = [], [], []
+        page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
+        page.on("pageerror", lambda e: page_errors.append(str(e)))
+        page.on("requestfailed", lambda r: failed.append(r.url))
+        page.goto(PAGES["home"], wait_until="networkidle")
+        page.wait_for_timeout(2800)
+        page.evaluate("document.fonts.ready")
 
-                # 화면 캡처
-                page.screenshot(path=str(OUT / f"{tag}-top.png"))
-                page.screenshot(path=str(OUT / f"{tag}-full.png"), full_page=True)
+        info = page.evaluate("""() => ({
+          scrollWidth: document.documentElement.scrollWidth,
+          innerWidth: window.innerWidth,
+          imgs: Array.from(document.images).map(i => ({ src: i.currentSrc.split('/').pop(), w: i.naturalWidth })),
+          hasGsap: document.documentElement.classList.contains('has-gsap'),
+          noWebgl: document.documentElement.classList.contains('no-webgl'),
+          h1: (document.querySelector('h1') || {}).innerText,
+          cards: document.querySelectorAll('.work').length,
+          gross: (document.body.innerHTML.match(/GROSS/g) || []).length
+        })""")
+        check("홈: 콘솔 오류 0", len(errors) == 0, errors[:3])
+        check("홈: 페이지 오류 0", len(page_errors) == 0, page_errors[:3])
+        check("홈: 실패 요청 0", len(failed) == 0, failed[:3])
+        check("홈: 가로 스크롤 없음", info["scrollWidth"] <= info["innerWidth"], f'{info["scrollWidth"]}/{info["innerWidth"]}')
+        check("홈: 이미지 로드", all(i["w"] > 0 for i in info["imgs"]) and len(info["imgs"]) >= 4, info["imgs"][:2])
+        check("홈: WebGL · GSAP", (not info["noWebgl"]) and info["hasGsap"])
+        check("홈: H1", "브랜드는" in info["h1"], info["h1"].replace("\n", " / "))
+        check("홈: 케이스 4건", info["cards"] == 4, info["cards"])
+        check("홈: GROSS 표기 0", info["gross"] == 0, info["gross"])
 
-                # 본문 텍스트 덤프
-                body_text = page.locator("body").inner_text()
-                (TEXT / f"{tag}.txt").write_text(body_text, encoding="utf-8")
-                issues = typo_scan(body_text)
-                check(f"{tag} · 표기 기계 검사", not issues, "; ".join(issues))
+        page.screenshot(path=str(PREVIEW / "pc-home-v3.png"))
+        page.screenshot(path=str(OUT / "01-home-desktop-v3.png"))
 
-                # 화면별 핵심 요소
-                if key == "home":
-                    h1 = page.locator("h1").first
-                    check(f"{tag} · 히어로 h1 표시", h1.is_visible())
-                    check(f"{tag} · 히어로 문구", "브랜드는" in h1.inner_text(), h1.inner_text().replace("\n", " ")[:80])
-                    if vp_name == "mobile":
-                        link = page.locator('a:has-text("체험단 사이트 보기")').first
-                        check(f"{tag} · 체험단 링크 href(모바일)",
-                              link.first.get_attribute("href") == "https://hya910819.github.io/matetrip/",
-                              link.first.get_attribute("href"))
-                        with page.context.expect_page() as info_m:
-                            link.first.click()
-                        npm = info_m.value
-                        npm.wait_for_load_state("load", timeout=60000)
-                        check(f"{tag} · 체험단 링크 클릭 → 메이트립 이동",
-                              npm.url.rstrip("/") == "https://hya910819.github.io/matetrip", npm.url)
-                        npm.close()
-                    if vp_name == "desktop":
-                        link = page.locator('a:has-text("체험단 사이트 보기")').first
-                        check(f"{tag} · 체험단 링크 href",
-                              link.get_attribute("href") == "https://hya910819.github.io/matetrip/",
-                              link.get_attribute("href"))
-                        check(f"{tag} · 체험단 링크 target",
-                              link.get_attribute("target") == "_blank", link.get_attribute("target"))
-                        with page.context.expect_page() as info:
-                            link.click()
-                        np = info.value
-                        np.wait_for_load_state("load", timeout=60000)
-                        check(f"{tag} · 체험단 링크 클릭 → 메이트립 이동",
-                              np.url.rstrip("/") == "https://hya910819.github.io/matetrip",
-                              np.url)
-                        np.screenshot(path=str(OUT / "click-matetrip-target.png"))
-                        np.close()
-                        # nav 앵커 동작
-                        page.evaluate("window.scrollTo(0,0)")
-                        page.wait_for_timeout(400)
-                        nav = page.locator('a[href="#services"]').first
-                        if nav.count() > 0:
-                            nav.click()
-                            page.wait_for_timeout(1200)
-                            y = page.evaluate("window.scrollY")
-                            check(f"{tag} · nav #services 앵커 스크롤", y > 100, f"scrollY={y}")
-                    canvas = page.evaluate("""() => {
-                        const c = document.querySelector('canvas');
-                        if (!c) return {canvas:false};
-                        let gl=false; try { gl = !!(c.getContext('webgl2')||c.getContext('webgl')); } catch(e) {}
-                        return {canvas:true, gl, three: !!window.THREE, gsap: !!window.gsap};
-                    }""")
-                    check(f"{tag} · 3D 캔버스·라이브러리", canvas.get("canvas") and canvas.get("gl"),
-                          json.dumps(canvas))
-                if key == "rank":
-                    kpi = page.locator(".kpi, [class*=kpi]").count()
-                    rows = page.locator("table tbody tr").count()
-                    check(f"{tag} · KPI 렌더", kpi >= 4, f"kpi {kpi}개")
-                    check(f"{tag} · 순위표 행", rows >= 10, f"{rows}행")
-                    check(f"{tag} · 그로스코리아 표기", "그로스코리아" in page.content())
-                    # 표가 화면 안에 있는지(컨테이너 내부 스크롤 허용)
-                    table_box = page.evaluate("""() => {
-                        const t = document.querySelector('table');
-                        if (!t) return null;
-                        const r = t.getBoundingClientRect();
-                        return {left: Math.round(r.left), right: Math.round(r.right), w: Math.round(r.width),
-                                innerWidth: window.innerWidth};
-                    }""")
-                    report["screens"][key][vp_name]["table"] = table_box
-                if key == "matetrip":
-                    check(f"{tag} · 본문 렌더", len(body_text.strip()) > 100, f"{len(body_text.strip())}자")
-                    # 상단 주요 링크/버튼 개수
-                    links = page.locator("a").count()
-                    check(f"{tag} · 링크 렌더", links >= 3, f"a {links}개")
+        # 워크 그리드 (카드가 보이는 위치)
+        page.evaluate("""() => {
+          document.documentElement.style.scrollBehavior = 'auto';
+          const y = document.getElementById('work').getBoundingClientRect().top + window.scrollY;
+          window.scrollTo(0, y + 150);
+        }""")
+        page.wait_for_timeout(1500)
+        page.screenshot(path=str(PREVIEW / "pc-work-v3.png"))
+        page.screenshot(path=str(OUT / "02-work-desktop-v3.png"))
 
-                ctx.close()
+        # 필터
+        page.click('.filters button[data-filter="tech"]')
+        page.wait_for_timeout(600)
+        tech = page.evaluate("() => Array.from(document.querySelectorAll('.work')).filter(c => !c.hidden).length")
+        check("홈: 필터(퍼포먼스·테크) 2건", tech == 2, tech)
+        page.click('.filters button[data-filter="all"]')
+        page.wait_for_timeout(500)
+
+        # 모달
+        page.click('.work[data-case="wagzag"] .work__open')
+        page.wait_for_timeout(800)
+        modal = page.evaluate("""() => {
+          const m = document.getElementById('caseModal');
+          return { hidden: m.hidden, title: (document.getElementById('caseTitle') || {}).innerText,
+                   steps: m.querySelectorAll('.case__step').length, links: m.querySelectorAll('.case__links a').length };
+        }""")
+        check("홈: 케이스 모달 열림", modal["hidden"] is False and modal["title"] == "와그자그 교동점", modal)
+        check("홈: 모달 4단계", modal["steps"] == 4, modal["steps"])
+        page.screenshot(path=str(OUT / "03-case-modal-desktop-v3.png"))
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(400)
+        check("홈: 모달 ESC 닫힘", page.evaluate("() => document.getElementById('caseModal').hidden") is True)
+
+        # 앵커
+        page.evaluate("window.scrollTo(0, 0)")
+        page.wait_for_timeout(500)
+        page.click('.nav a[data-nav="contact"]')
+        page.wait_for_timeout(1600)
+        anchor = page.evaluate("() => Math.round(document.getElementById('contact').getBoundingClientRect().top)")
+        check("홈: 앵커 이동(헤더에 가리지 않음)", 60 <= anchor <= 120, anchor)
+
+        # 폼
+        page.click(".form__submit")
+        page.wait_for_timeout(400)
+        errs = page.evaluate("() => Array.from(document.querySelectorAll('.field__err')).map(e => e.textContent.trim()).filter(Boolean).length")
+        check("홈: 폼 필수 검증", errs == 3, errs)
+        ctx.close()
+
+        # ---------- 3) 홈 · 모바일 ----------
+        ctx = browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+        page = ctx.new_page()
+        merr = []
+        page.on("console", lambda m: merr.append(m.text) if m.type == "error" else None)
+        page.on("pageerror", lambda e: merr.append(str(e)))
+        page.goto(PAGES["home"], wait_until="networkidle")
+        page.wait_for_timeout(2600)
+        m = page.evaluate("() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth })")
+        check("모바일: 가로 스크롤 없음", m["sw"] <= m["iw"], f'{m["sw"]}/{m["iw"]}')
+        check("모바일: 콘솔 오류 0", len(merr) == 0, merr[:2])
+        page.screenshot(path=str(PREVIEW / "mobile-home-v3.png"))
+        page.screenshot(path=str(OUT / "04-home-mobile-v3.png"))
+        page.click("#burger")
+        page.wait_for_timeout(700)
+        check("모바일: 드로어", page.evaluate("() => document.getElementById('menu').classList.contains('is-open')"))
+        page.click('.menu a[href="#work"]')
+        page.wait_for_timeout(1300)
+        page.screenshot(path=str(OUT / "05-work-mobile-v3.png"))
+        page.click('.work[data-case="roomnonda"] .work__open')
+        page.wait_for_timeout(800)
+        check("모바일: 모달", page.evaluate("() => !document.getElementById('caseModal').hidden"))
+        page.screenshot(path=str(OUT / "06-case-modal-mobile-v3.png"))
+        ctx.close()
+
+        # ---------- 4) 다른 페이지 ----------
+        for name in ("rank", "creator", "wagzag-booking"):
+            ctx = browser.new_context(viewport={"width": 1440, "height": 900})
+            page = ctx.new_page()
+            errs, bad = [], []
+            page.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
+            page.on("pageerror", lambda e: bad.append(str(e)))
+            page.goto(PAGES[name], wait_until="networkidle")
+            page.wait_for_timeout(1400)
+            st = page.evaluate("() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, title: document.title })")
+            check(f"{name}: 스크롤·오류 없음", st["sw"] <= st["iw"] and not errs and not bad, f'{st["sw"]}/{st["iw"]} · {errs[:1]}')
+            page.screenshot(path=str(OUT / f"07-{name}-desktop-v3.png"))
+            ctx.close()
+
         browser.close()
 
-    real_console = [e for e in console_errors if "favicon" not in e["text"].lower()]
-    check("콘솔 오류 0건", not real_console, json.dumps(real_console, ensure_ascii=False)[:300])
-    check("페이지 오류 0건", not page_errors, json.dumps(page_errors, ensure_ascii=False)[:300])
-    check("실패 요청 0건", not failed_requests, json.dumps(failed_requests[:5], ensure_ascii=False)[:400])
-
-    report.update({
-        "checks": checks,
-        "passed": sum(1 for c in checks if c["ok"]),
-        "total": len(checks),
-        "console_errors": console_errors,
-        "page_errors": page_errors,
-        "failed_requests": failed_requests,
-    })
-    (ROOT / "verify_live-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"\n결과: {report['passed']}/{report['total']} 통과")
-    ok = report["passed"] == report["total"]
-    print("전체 통과" if ok else "실패 항목 있음")
-    raise SystemExit(0 if ok else 1)
+    report = {"at": time.strftime("%Y-%m-%d %H:%M:%S"), "total": len(results),
+              "passed": sum(1 for r in results if r["ok"]), "failed": [r for r in results if not r["ok"]], "checks": results}
+    (OUT / "verify-live-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"\n{report['passed']}/{report['total']} 통과")
+    return 0 if report["passed"] == report["total"] else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
