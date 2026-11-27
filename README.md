@@ -105,6 +105,6 @@ LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 ve
 ## 크리에이터스 (`/creator/`)
 
 - 크리에이터 모집 플랫폼 1차 시연 버전입니다. 캠페인·지원자·매칭 점수는 예시 데이터이고, 입력 내용은 서버로 전송되지 않고 접속한 브라우저의 `localStorage`(`gk.creators.v1`)에만 저장됩니다.
-- 원본·검증: `work/creator-platform/` (`python3 build.py`, `verify.py` 78/78 통과)
+- 원본·검증: `work/creator-platform/` (`python3 build.py`, `verify.py` 80/80 통과)
 - 바이오링크 공유는 `.../creator/#p=<base64로 인코딩한 프로필>` 형태로 링크 자체에 프로필이 담깁니다. 암호화가 아니므로 누구나 내용을 볼 수 있고, 서버가 없어도 상대 화면에 보이지만 링크가 길고 수정 시 새로 복사해야 합니다.
 - 매니저 콘솔은 로그인 없이 열립니다. 예시 데이터만 들어 있어 위험은 없지만, 실제 접수 데이터를 연결할 때는 반드시 인증을 붙여야 합니다.

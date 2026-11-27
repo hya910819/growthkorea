@@ -1082,7 +1082,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="page-head">
         <p class="eyebrow"><span class="rule"></span> CAMPAIGN BOARD <span class="demo-tag">예시 데이터</span></p>
         <h1>조건을 비교하고,<br>맞는 캠페인에 지원하세요.</h1>
-        <p>그로스코리아가 관리하는 매장·브랜드의 모집 공고입니다. 유형과 지역, 원고료로 걸러 보고 카드를 눌러 제공 내역과 필수 키워드를 확인하세요.</p>
+        <p>그로스코리아가 관리하는 매장·브랜드의 모집 공고입니다. 유형과 지역, 제공 혜택과 원고료로 걸러 보고 카드를 눌러 제공 내역과 필수 키워드를 확인하세요.</p>
       </div>
 
       <div class="filters" role="group" aria-label="캠페인 필터">
@@ -1102,6 +1102,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
             <option value="부산">부산</option>
             <option value="경산">경산</option>
             <option value="온라인">온라인</option>
+          </select>
+          <select id="benefitSelect" aria-label="제공 혜택 선택">
+            <option value="전체">혜택 전체</option>
+            <option value="meal">식사·음료 제공</option>
+            <option value="product">제품 제공</option>
+            <option value="parking">주차 가능</option>
           </select>
           <select id="feeSelect" aria-label="원고료 선택">
             <option value="전체">원고료 전체</option>
@@ -1569,7 +1575,7 @@ const GK_DATA = {
     mode: "creator",
     page: 1,
     pageSize: 8,
-    filters: { cat: "전체", region: "전체", fee: "전체", sort: "deadline" },
+    filters: { cat: "전체", region: "전체", fee: "전체", benefit: "전체", sort: "deadline" },
     mtab: "applicants",
     appFilters: { q: "", campaign: "전체", status: "전체", sort: "score" }
   };
@@ -1717,6 +1723,14 @@ const GK_DATA = {
     if (v === "over20") return c.fee >= 200000;
     return true;
   }
+  function matchBenefit(c, v) {
+    if (v === "전체") return true;
+    var text = (c.benefits || []).join(" ");
+    if (v === "parking") return text.indexOf("주차") >= 0;
+    if (v === "product") return text.indexOf("밀키트") >= 0 || text.indexOf("제품") >= 0;
+    if (v === "meal") return /식사|음료|안주|오마카세|디저트/.test(text);
+    return true;
+  }
   function filteredCampaigns() {
     var f = ui.filters;
     var list = state.campaigns.filter(function (c) {
@@ -1725,6 +1739,7 @@ const GK_DATA = {
         else if (c.type !== f.cat) return false;
       }
       if (f.region !== "전체" && c.regionGroup !== f.region) return false;
+      if (!matchBenefit(c, f.benefit)) return false;
       if (!matchFee(c, f.fee)) return false;
       return true;
     });
@@ -2525,6 +2540,7 @@ const GK_DATA = {
     });
 
     $("#regionSelect").addEventListener("change", function () { ui.filters.region = this.value; renderBoard(); });
+    $("#benefitSelect").addEventListener("change", function () { ui.filters.benefit = this.value; renderBoard(); });
     $("#feeSelect").addEventListener("change", function () { ui.filters.fee = this.value; renderBoard(); });
     $("#sortSelect").addEventListener("change", function () { ui.filters.sort = this.value; renderBoard(); });
 
