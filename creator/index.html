@@ -907,9 +907,13 @@ select{
   body.has-reveal [data-reveal].in{opacity:1;translate:0 0}
 }
 
+@media (max-width:1260px){
+  /* 카드가 히어로 우측 칸을 거의 다 쓰는 폭에서는 부유 오브젝트를 숨긴다(본문·카드 정보 침범 방지) */
+  .hero-obj.mega{display:none}
+  .hero-obj.chip{display:none}
+}
 @media (max-width:1080px){
   .cat-strip{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .hero-obj.mega{width:150px;height:150px;left:-46px}
 }
 @media (max-width:900px){
   .cat-band{padding:16px 0 2px}
