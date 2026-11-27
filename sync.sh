@@ -14,6 +14,7 @@ set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 WEB="$DIR/../groskorea-website"
 RANK="$DIR/../place-rank-dashboard"
+BOOK="$DIR/../wagzag-booking"
 MATETRIP_URL="https://hya910819.github.io/matetrip/"
 LOCAL_MVP='../gross-experience-site/index.html'
 
@@ -41,7 +42,12 @@ python3 "$RANK/build.py"
 mkdir -p "$DIR/rank"
 cp "$RANK/dist/place-rank-dashboard.html" "$DIR/rank/index.html"
 
-echo "== 4) 점검"
+echo "== 4) 와그자그 예약 보드 복사"
+python3 "$BOOK/build.py"
+mkdir -p "$DIR/wagzag-booking"
+cp "$BOOK/dist/wagzag-booking.html" "$DIR/wagzag-booking/index.html"
+
+echo "== 5) 점검"
 grep -c "https://hya910819.github.io/matetrip/" "$DIR/index.html" | sed 's/^/   메이트립 링크 수: /'
 if grep -q "gross-experience-site" "$DIR/index.html"; then
   echo "   ✗ 로컬 MVP 링크가 남아 있습니다"; exit 1
@@ -50,4 +56,5 @@ for f in "$DIR/vendor/three.module.min.js" "$DIR/vendor/three.min.js" "$DIR/vend
   [ -s "$f" ] || { echo "   ✗ 누락: $f"; exit 1; }
 done
 [ -s "$DIR/rank/index.html" ] || { echo "   ✗ 누락: rank/index.html"; exit 1; }
-echo "   완료 · index.html $(wc -c < "$DIR/index.html" | tr -d ' ') bytes · rank/index.html $(wc -c < "$DIR/rank/index.html" | tr -d ' ') bytes"
+[ -s "$DIR/wagzag-booking/index.html" ] || { echo "   ✗ 누락: wagzag-booking/index.html"; exit 1; }
+echo "   완료 · index.html $(wc -c < "$DIR/index.html" | tr -d ' ') bytes · rank/index.html $(wc -c < "$DIR/rank/index.html" | tr -d ' ') bytes · wagzag-booking/index.html $(wc -c < "$DIR/wagzag-booking/index.html" | tr -d ' ') bytes"

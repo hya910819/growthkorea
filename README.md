@@ -1,11 +1,12 @@
 # 그로스코리아 — 회사 홈페이지 · 플레이스 순위 대시보드
 
-그로스코리아(GROWTH KOREA) GitHub Pages 배포 저장소입니다. 페이지 두 개를 함께 게시합니다.
+그로스코리아(GROWTH KOREA) GitHub Pages 배포 저장소입니다. 페이지 세 개를 함께 게시합니다.
 
 | 주소 | 페이지 | 원본 |
 |---|---|---|
 | `https://hya910819.github.io/growthkorea/` | 회사 홈페이지 v2 (3D·모션그래픽) | `work/groskorea-website/index.html` |
 | `https://hya910819.github.io/growthkorea/rank/` | 지점별 네이버 플레이스 순위 관리 대시보드 | `work/place-rank-dashboard/dist/place-rank-dashboard.html` |
+| `https://hya910819.github.io/growthkorea/wagzag-booking/` | 와그자그 교동점 직원용 예약 보드 (PIN 잠금) | `work/wagzag-booking/dist/wagzag-booking.html` |
 
 > 회사 영문 표기는 **GROWTH KOREA**입니다(`GROSS` 아님).
 
@@ -16,6 +17,7 @@ growthkorea-pages/
 ├─ index.html          홈페이지 (문서 1개 + vendor 폴백). '체험단 사이트 보기' → https://hya910819.github.io/matetrip/
 ├─ vendor/             CDN이 막힌 환경을 위한 로컬 폴백 (three · gsap · ScrollTrigger)
 ├─ rank/index.html     순위 대시보드 단일 파일 (CSS·JS 인라인, 외부 요청 0건)
+├─ wagzag-booking/index.html  와그자그 예약 보드 단일 파일 (예약 데이터는 PIN 기반 암호문)
 ├─ .nojekyll           GitHub Pages의 Jekyll 처리 생략
 ├─ sync.sh             원본 → 배포본 동기화 (커밋·푸시 없음)
 ├─ deploy.sh           sync → 커밋 → main·gh-pages 푸시 → 접속 확인
@@ -39,10 +41,10 @@ bash work/growthkorea-pages/deploy.sh
 `deploy.sh`가 하는 일
 
 1. `gh api /repos/hya910819/growthkorea` 로 저장소 확인 (없으면 안내 후 종료)
-2. `sync.sh` 로 원본에서 `index.html` · `vendor/` · `rank/index.html` 을 다시 만듦
+2. `sync.sh` 로 원본에서 `index.html` · `vendor/` · `rank/index.html` · `wagzag-booking/index.html` 을 다시 만듦
 3. 커밋 (변경분이 있을 때만)
 4. `main` 과 `gh-pages` 를 같은 내용으로 푸시 (`gh-pages` 는 force)
-5. `https://hya910819.github.io/growthkorea/` 와 `/rank/` 가 HTTP 200이 될 때까지 확인
+5. `https://hya910819.github.io/growthkorea/` · `/rank/` · `/wagzag-booking/` 가 HTTP 200이 될 때까지 확인
 
 GitHub Pages 게시 소스는 **`gh-pages` 브랜치 `/` (root)** 입니다. Pickle의 GitHub 앱 토큰에는 Pages 설정 권한(`pages=write`, `administration=write`)이 없어 API로 소스를 바꿀 수 없기 때문에, `main`과 `gh-pages`를 함께 밀어 넣는 메이트립(`hya910819/matetrip`)과 같은 방식을 씁니다.
 
@@ -90,3 +92,10 @@ LD_LIBRARY_PATH=/workspace/.cache/chromedeps/usr/lib/x86_64-linux-gnu python3 ve
 - 저장소가 Public이면 `/rank/` 도 **주소를 아는 사람은 누구나** 열 수 있습니다(로그인 없음). 고객사·매장명이 화면에 보이므로 링크는 내부에만 공유하세요.
 - 대시보드 기록은 서버가 아니라 **각자 브라우저의 `localStorage`(`gk.placeRank.v1`)** 에 저장됩니다. PC를 바꾸면 `JSON 백업`으로 옮겨야 하고, 팀원끼리 같은 데이터를 보려면 백업 파일을 주고받아야 합니다.
 - 홈페이지 상담 폼은 서버 전송 없이 화면에서 문구를 만들고 카카오톡으로 넘기는 방식입니다. 그래서 정적 페이지만으로 동작합니다.
+
+## 예약 보드 (`/wagzag-booking/`) — 개인정보 보호
+
+- 저장소가 **Public** 이므로, 예약 보드의 고객 이름·연락처는 `wagzag-booking/index.html` **소스에 평문으로 들어가지 않습니다**. `work/wagzag-booking/build.py` 가 예약 데이터를 매장 공용 4자리 PIN 으로 XOR+Base64 암호화해 넣고, 빌드가 평문 0건을 직접 검사합니다.
+- 접속할 때 4자리 PIN 을 한 번 입력하면 그 기기(브라우저)의 `localStorage` 에 기억됩니다. PIN 은 소스에 넣지 않습니다.
+- 브라우저가 직접 복호화하는 구조라 **4자리 PIN 은 자물쇠가 아니라 가림막**입니다. 주소는 내부 직원에게만 공유하고, 더 강한 보호가 필요하면 비공개 저장소·서버 로그인으로 옮겨야 합니다.
+- 예약 저장 위치: 각 직원 브라우저의 `localStorage`(`wz.booking.v1`, 암호문). 기기를 바꾸면 화면의 **데이터 → 백업 파일**로 옮기고, 백업 파일도 같은 PIN 으로만 열립니다.
