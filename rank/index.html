@@ -1864,7 +1864,7 @@ body.modal-open{overflow:hidden}
 
   function deltaPill(diff, opts) {
     opts = opts || {};
-    if (diff === null || diff === undefined) return '<span class="delta na" title="전일 기록 없음">–</span>';
+    if (diff === null || diff === undefined) return '<span class="delta na" title="전일 비교 불가 (전일 권외이거나 기록 없음)">–</span>';
     if (diff === 0) return '<span class="delta flat">-</span>';
     if (diff > 0) return '<span class="delta up">▲' + diff + '</span>';
     return '<span class="delta down">▼' + Math.abs(diff) + '</span>';
